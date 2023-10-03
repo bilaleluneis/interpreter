@@ -1,1 +1,20 @@
+#goimpl ignore list
 goimpl/goimpl.iml
+
+#kotlinimpl ignore list
+kotlinimpl/.idea
+kotlinimpl/kotlinimpl.iml
+
+#pyimpl ignore list
+pyimpl/pyimpl.iml
+
+#rustimpl ignore list
+rustimpl/target
+rustimpl/rustimpl.iml
+
+#vimpl ignore list
+vimpl/vimpl.iml
+
+#root project ignore list
+interpreter.iml
+.idea

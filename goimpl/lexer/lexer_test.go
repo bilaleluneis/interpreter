@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestSimple(t *testing.T) {
+func TestSimpleTokens(t *testing.T) {
 
 	input := "=+,;(){}"
 
@@ -25,7 +25,7 @@ func TestSimple(t *testing.T) {
 
 }
 
-func TestToken(t *testing.T) {
+func TestMinLanguageConstruct(t *testing.T) {
 
 	input := `	let five = 5;
 				let ten = 10;
@@ -90,7 +90,10 @@ type expectedToken struct {
 }
 
 func testLexer(input string, tests []expectedToken, t *testing.T) {
-	l := New(input)
+	l, ok := New(input)
+	if !ok {
+		t.Fatalf("lexer failed to init")
+	}
 
 	for i, tokTest := range tests {
 		tok := l.NextToken()

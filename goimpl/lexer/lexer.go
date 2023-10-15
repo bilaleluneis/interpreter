@@ -1,6 +1,8 @@
 package lexer
 
-import "goimpl/token"
+import (
+	"goimpl/token"
+)
 
 type Lexer struct {
 	input               string
@@ -9,51 +11,81 @@ type Lexer struct {
 	charUnderInspection byte
 }
 
-func New(input string) *Lexer { return &Lexer{input: input} }
+func New(input string) (*Lexer, bool) {
+	if len(input) == 0 {
+		return nil, false
+	}
+	return &Lexer{input: input}, true
+}
 
+// NextToken TODO: refactor to reduce if/else and manual advanceLoc()
 func (l *Lexer) NextToken() token.Token {
 
-	for l.selectCharToInspect(); isWhiteSpace(l.charUnderInspection); l.selectCharToInspect() {
+	for isWhiteSpace(l.peek()) {
+		l.advanceLoc()
 	}
 
-	//check if this is a IDENTIFIER or KEYWORD token
-	if isLetter(l.charUnderInspection) {
+	l.charUnderInspection = l.peek()
 
+	tokenToReturn := token.NewToken(token.ILLIGAL, l.charUnderInspection)
+	if isEof(l.charUnderInspection) {
+		tokenToReturn = token.Token{Type: token.EOF, Literal: ""}
+	} else if isOperator(l.charUnderInspection) {
+		tokenToReturn = token.NewToken(operators[l.charUnderInspection], l.charUnderInspection)
+		l.advanceLoc()
+	} else if isSeperator(l.charUnderInspection) {
+		tokenToReturn = token.NewToken(seperators[l.charUnderInspection], l.charUnderInspection)
+		l.advanceLoc()
+	} else if isBlockOrSubscript(l.charUnderInspection) {
+		tokenToReturn = token.NewToken(blocksAndSubscripts[l.charUnderInspection], l.charUnderInspection)
+		l.advanceLoc()
+	} else if isDigit(l.charUnderInspection) {
+		digits := l.captureDigits()
+		tokenToReturn = token.Token{Type: token.INT, Literal: digits}
+	} else if isLetter(l.charUnderInspection) {
+		//capture the litral string
+		litral := l.captureLiteral()
+
+		//check if literal is a keyword
+		if tokenType, ok := keywords[litral]; ok {
+			tokenToReturn = token.Token{Type: tokenType, Literal: litral}
+		} else {
+			tokenToReturn = token.Token{Type: token.IDENTIFIER, Literal: litral}
+		}
 	}
 
-	switch l.charUnderInspection {
-
-	case 0:
-		return token.Token{Type: token.EOF, Literal: ""}
-	case '=':
-		return token.NewToken(token.ASSIGN, l.charUnderInspection)
-	case '+':
-		return token.NewToken(token.PLUS, l.charUnderInspection)
-	case ',':
-		return token.NewToken(token.COMMA, l.charUnderInspection)
-	case '(':
-		return token.NewToken(token.LPRAN, l.charUnderInspection)
-	case ')':
-		return token.NewToken(token.RPRAN, l.charUnderInspection)
-	case '{':
-		return token.NewToken(token.LBRACE, l.charUnderInspection)
-	case '}':
-		return token.NewToken(token.RBRACE, l.charUnderInspection)
-	case ';':
-		return token.NewToken(token.SEMICOLON, l.charUnderInspection)
-	default:
-		return token.NewToken(token.ILLIGAL, l.charUnderInspection)
-
-	}
+	return tokenToReturn
 
 }
 
-func (l *Lexer) selectCharToInspect() {
-	if l.nextReadIndex >= len(l.input) {
-		l.charUnderInspection = 0
-	} else {
-		l.charUnderInspection = l.input[l.nextReadIndex]
-	}
+func (l *Lexer) advanceLoc() {
 	l.prevReadIndx = l.nextReadIndex
 	l.nextReadIndex++
+}
+
+func (l *Lexer) peek() byte {
+	if l.nextReadIndex >= len(l.input) {
+		return 0
+	}
+	return l.input[l.nextReadIndex]
+}
+
+func (l *Lexer) captureLiteral() string {
+	var litral string
+	for ; !isWhiteSpace(l.peek()) && isLetter(l.peek()); l.advanceLoc() {
+		letter := l.peek()
+		litral += string(letter)
+		l.charUnderInspection = letter
+	}
+	return litral
+}
+
+func (l *Lexer) captureDigits() string {
+	var digits string
+	for ; !isWhiteSpace(l.peek()) && isDigit(l.peek()); l.advanceLoc() {
+		digit := l.peek()
+		digits += string(digit)
+		l.charUnderInspection = digit
+	}
+	return digits
 }

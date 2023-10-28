@@ -5,6 +5,8 @@ import (
 	"slices"
 )
 
+// TODO: convert slices and maps to const slices and maps and have constructed at compile time
+// TODO: introduce array of valid latters as compile time constant
 var whiteSpace = []byte{
 	' ',  //space
 	'\t', //tab

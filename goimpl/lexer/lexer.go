@@ -74,8 +74,8 @@ func (l *Lexer) captureLiteral() string {
 	var litral string
 	for ; !isWhiteSpace(l.peek()) && isLetter(l.peek()); l.advanceLoc() {
 		letter := l.peek()
-		litral += string(letter)
 		l.charUnderInspection = letter
+		litral += string(l.charUnderInspection)
 	}
 	return litral
 }
@@ -84,8 +84,8 @@ func (l *Lexer) captureDigits() string {
 	var digits string
 	for ; !isWhiteSpace(l.peek()) && isDigit(l.peek()); l.advanceLoc() {
 		digit := l.peek()
-		digits += string(digit)
 		l.charUnderInspection = digit
+		digits += string(l.charUnderInspection)
 	}
 	return digits
 }

@@ -7,6 +7,7 @@ kotlinimpl/kotlinimpl.iml
 
 #pyimpl ignore list
 pyimpl/pyimpl.iml
+/pyimpl/src/pyimpl.egg-info/
 
 #rustimpl ignore list
 rustimpl/target
@@ -14,6 +15,7 @@ rustimpl/rustimpl.iml
 
 #vimpl ignore list
 vimpl/vimpl.iml
+vimpl/.editorconfig
 
 #root project ignore list
 interpreter.iml

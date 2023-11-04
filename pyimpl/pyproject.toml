@@ -1,0 +1,12 @@
+[project]
+name = "pyimpl"
+version = "0.1"
+authors = [{ name = "Bilal El Uneis", email = "bilaleluneis@gmail.com" }]
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+
+

@@ -37,7 +37,7 @@ class TokenType(StrEnum, metaclass=__MetaEnum):
     INT = "int"
 
     # Keywords.
-    FUNCTION = "function"
+    FUNCTION = "fn"
     LET = "let"
 
     ILLIGAL = "illigal"

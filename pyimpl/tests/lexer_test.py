@@ -1,25 +1,29 @@
-from pyimpl import Token, TokenType, Lexer
+import pytest
+
+from pyimpl import Token, TokenType, Lexer  # type: ignore
 
 
-def test_simple_tokens():
-    input_tokens = "=+(){},;"
+@pytest.mark.parametrize("literal, expected", [
+    ("=", TokenType.ASSIGN),
+    ("+", TokenType.PLUS),
+    ("(", TokenType.LEFT_PAREN),
+    (")", TokenType.RIGHT_PAREN),
+    ("{", TokenType.LEFT_BRACE),
+    ("}", TokenType.RIGHT_BRACE),
+    (",", TokenType.COMMA),
+    (";", TokenType.SEMICOLON),
+    ("fn", TokenType.FUNCTION),
+    ("let", TokenType.LET),
+    ("x", TokenType.IDENTIFIER),
+    ("int", TokenType.INT),
+])
+def test_token_emitted(literal: str, expected: TokenType) -> None:
+    lexer = Lexer(literal)
+    token = lexer.next_token()
+    assert token.token_type == expected
 
-    expected_tokens = [
-        Token(TokenType.ASSIGN, "="),
-        Token(TokenType.PLUS, "+"),
-        Token(TokenType.LEFT_PAREN, "("),
-        Token(TokenType.RIGHT_PAREN, ")"),
-        Token(TokenType.LEFT_BRACE, "{"),
-        Token(TokenType.RIGHT_BRACE, "}"),
-        Token(TokenType.COMMA, ","),
-        Token(TokenType.SEMICOLON, ";"),
-        Token(TokenType.EOF, ""),
-    ]
 
-    assert lexable(input_tokens, expected_tokens)
-
-
-def test_min_language_construct():
+def test_min_language_construct() -> None:
     input_tokens = ("   let five = 5;\n"
                     "   let ten = 10;\n"
                     "	let add = fn(x, y) { x + y };\n"

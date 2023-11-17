@@ -15,7 +15,7 @@ from pyimpl import Token, TokenType, Lexer  # type: ignore
     ("fn", TokenType.FUNCTION),
     ("let", TokenType.LET),
     ("x", TokenType.IDENTIFIER),
-    ("int", TokenType.INT),
+    ("5", TokenType.INT),
 ])
 def test_token_emitted(literal: str, expected: TokenType) -> None:
     lexer = Lexer(literal)

@@ -1,5 +1,3 @@
-#goimpl ignore list
-goimpl/goimpl.iml
 
 #kotlinimpl ignore list
 kotlinimpl/.idea
@@ -13,9 +11,9 @@ pyimpl/pyimpl.iml
 rustimpl/target
 rustimpl/rustimpl.iml
 
-#vimpl ignore list
-vimpl/vimpl.iml
-vimpl/.editorconfig
+#goimpl ignore list
+goimpl/.idea
+goimpl/goimpl.iml
 
 #root project ignore list
 interpreter.iml

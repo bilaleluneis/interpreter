@@ -1,5 +1,5 @@
 #goimpl ignore list
-/goimpl/goimpl.iml
+goimpl/*.iml
 
 #kotlinimpl ignore list
 kotlinimpl/.idea

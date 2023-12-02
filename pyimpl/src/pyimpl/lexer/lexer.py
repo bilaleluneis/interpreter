@@ -35,9 +35,9 @@ class Lexer:
                 return Token(TokenType.COMMA, tok_as_str)
             case ";":
                 return Token(TokenType.SEMICOLON, tok_as_str)
-            case _ if tok_as_str.isalpha():
+            case tok if tok.isalpha():
                 return self.__spit_token_from_literal()
-            case _ if tok_as_str.isdigit():
+            case tok if tok.isdigit():
                 return Token(TokenType.INT, self.__read_digits())
             case _:
                 return Token(TokenType.ILLIGAL, tok_as_str)

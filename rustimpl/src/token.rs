@@ -30,8 +30,8 @@ impl Token {
             ";" => Token::Semicolon,
             "+" => Token::Plus,
             "=" => Token::Assign,
-            _ if possible_tok.parse::<u64>().is_ok() => Token::Int(possible_tok.parse::<u64>().unwrap()),
-            _ if possible_tok.chars().all(|c| c.is_alphabetic()) => Token::Ident(possible_tok.to_string()),
+            t if t.parse::<u64>().is_ok() => Token::Int(t.parse::<u64>().unwrap()),
+            t if t.chars().all(|c| c.is_alphabetic()) => Token::Ident(t.to_string()),
             _ => Token::Illegal(possible_tok.to_string()),
         }
     }

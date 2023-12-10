@@ -148,6 +148,20 @@ mod tests {
             Token::Ident("y".to_string()),
             Token::Rbrace,
             Token::Semicolon,
+
+            // let result = add(five, ten);
+            Token::Let,
+            Token::Ident("result".to_string()),
+            Token::Assign,
+            Token::Ident("add".to_string()),
+            Token::Lparen,
+            Token::Ident("five".to_string()),
+            Token::Comma,
+            Token::Ident("ten".to_string()),
+            Token::Rparen,
+            Token::Semicolon,
+
+            Token::Eof
         ];
         for expected_tok in expected_tokens {
             assert_eq!(lexer.next_token(), expected_tok);

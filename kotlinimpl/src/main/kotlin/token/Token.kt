@@ -18,7 +18,7 @@ data class IntValue(val value: Int) : Token
 data class Identifier(val value: String) : Token
 
 
-fun lookup(tok: String): Token {
+internal fun lookup(tok: String): Token {
     return with(tok) {
         when {
             isBlank() -> Eof

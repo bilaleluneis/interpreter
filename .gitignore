@@ -15,6 +15,15 @@ rustimpl/rustimpl.iml
 goimpl/.idea
 goimpl/goimpl.iml
 
+#monkey ignore list
+monkey/build/
+monkey/.build/
+monkey/gradle/
+monkey/.gradle/
+monkey/.run
+monkey/gradlew
+monkey/gradlew.bat
+
 #root project ignore list
 interpreter.iml
 .idea

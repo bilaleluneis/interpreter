@@ -1,0 +1,4 @@
+Monkey File
+  MonkeyPropertyImpl(PROPERTY)
+    PsiElement(MonkeyTokenType.KEY)('foo')
+    PsiElement(MonkeyTokenType.SEPARATOR)(':')

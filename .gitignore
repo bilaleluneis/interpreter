@@ -16,13 +16,14 @@ goimpl/.idea
 goimpl/goimpl.iml
 
 #monkey ignore list
-monkey/build/
-monkey/.build/
-monkey/gradle/
-monkey/.gradle/
-monkey/.run
-monkey/gradlew
-monkey/gradlew.bat
+monkey-ide/build/
+monkey-ide/.build/
+monkey-ide/gradle/
+monkey-ide/.gradle/
+monkey-ide/.run
+monkey-ide/gradlew
+monkey-ide/gradlew.bat
+monkey-ide/gradle.properties
 
 #root project ignore list
 interpreter.iml

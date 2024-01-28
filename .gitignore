@@ -15,6 +15,12 @@ rustimpl/rustimpl.iml
 goimpl/.idea
 goimpl/goimpl.iml
 
+#scala-imple ignore list
+scala-impl/.idea
+scala-impl/.bsp
+scala-impl/scala-impl.iml
+
+
 #monkey ignore list
 monkey-ide/build/
 monkey-ide/.build/

@@ -4,6 +4,11 @@ import (
 	"goimpl/token"
 )
 
+// LexerType is an interface that can be used in stubbing tests
+type LexerType interface {
+	NextToken() token.Token
+}
+
 type Lexer struct {
 	input               string
 	prevReadIndx        int

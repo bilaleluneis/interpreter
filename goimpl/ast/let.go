@@ -8,5 +8,14 @@ type Let struct {
 	Value Expression
 }
 
-func (l Let) statment()            {}
+func (l Let) statmentNode() {}
+
 func (l Let) TokenLiteral() string { return l.Tok.Literal }
+
+func (l Let) String() string {
+	out := l.Tok.Literal + " " + l.Name.String() + " = "
+	if l.Value != nil {
+		out += l.Value.String()
+	}
+	return out + ";"
+}

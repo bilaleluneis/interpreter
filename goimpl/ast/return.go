@@ -7,7 +7,7 @@ type Return struct {
 	Value Expression
 }
 
-func (r Return) statmentNode() {}
+func (Return) statmentNode() {}
 
 func (r Return) TokenLiteral() string { return r.Tok.Literal }
 

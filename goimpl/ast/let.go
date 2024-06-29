@@ -8,7 +8,7 @@ type Let struct {
 	Value Expression
 }
 
-func (l Let) statmentNode() {}
+func (Let) statmentNode() {}
 
 func (l Let) TokenLiteral() string { return l.Tok.Literal }
 

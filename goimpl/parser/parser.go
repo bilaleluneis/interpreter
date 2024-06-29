@@ -27,7 +27,7 @@ func New(l lexer.LexerType) *Parser {
 		prefixParseFns: make(map[token.TokenType]prefixParseFn),
 		infixParseFns:  make(map[token.TokenType]infixParseFn),
 	}
-	p.registerPrefix(token.IDENTIFIER, parseIdentifier)
+	register(p)
 	p.currTok = p.lexer.NextToken()
 	p.peekTok = p.lexer.NextToken()
 	return p
@@ -81,4 +81,9 @@ func (p *Parser) parseStatement() ast.Statement {
 	}
 
 	return node
+}
+
+func register(p *Parser) {
+	p.registerPrefix(token.IDENTIFIER, parseIdentifier)
+	p.registerPrefix(token.INT, parseInteger)
 }

@@ -33,5 +33,9 @@ func parseExprWithPriority(p *Parser, precedence precidence) (ast.Expression, er
 	if prefix == nil {
 		return nil, fmt.Errorf("no prefix parse function for %s found", p.currTok.Type)
 	}
-	return prefix(), nil
+	return prefix(p), nil
+}
+
+var parseIdentifier prefixParseFn = func(parser *Parser) ast.Expression {
+	return &ast.Identifier{Tok: parser.currTok, Value: parser.currTok.Literal}
 }

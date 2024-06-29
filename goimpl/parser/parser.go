@@ -7,8 +7,9 @@ import (
 )
 
 type parseStatement func(parser *Parser) (ast.Statement, error)
-type prefixParseFn func() ast.Expression
-type infixParseFn func(ast.Expression) ast.Expression
+type parseExpression func(parser *Parser) (ast.Expression, error)
+type prefixParseFn func(parser *Parser) ast.Expression
+type infixParseFn func(parser *Parser, exp ast.Expression) ast.Expression
 
 type Parser struct {
 	lexer          lexer.LexerType
@@ -26,7 +27,7 @@ func New(l lexer.LexerType) *Parser {
 		prefixParseFns: make(map[token.TokenType]prefixParseFn),
 		infixParseFns:  make(map[token.TokenType]infixParseFn),
 	}
-	p.registerPrefix(token.IDENTIFIER, p.parseIdentifier)
+	p.registerPrefix(token.IDENTIFIER, parseIdentifier)
 	p.currTok = p.lexer.NextToken()
 	p.peekTok = p.lexer.NextToken()
 	return p
@@ -42,12 +43,6 @@ func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
 
 func (p *Parser) Errors() []string {
 	return p.errors
-}
-
-func (p *Parser) addErr(err error) {
-	if err != nil {
-		p.errors = append(p.errors, err.Error())
-	}
 }
 
 func (p *Parser) nextToken() {
@@ -69,6 +64,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 
 func (p *Parser) parseStatement() ast.Statement {
 	var parseFn = parseInvalid
+
 	switch p.currTok.Type {
 	case token.LET:
 		parseFn = parseLetStatment
@@ -77,11 +73,12 @@ func (p *Parser) parseStatement() ast.Statement {
 	default:
 		parseFn = parseExpressionStatement
 	}
-	node, err := parseFn(p)
-	p.addErr(err) //add error to parser if any
-	return node
-}
 
-func (p *Parser) parseIdentifier() ast.Expression {
-	return &ast.Identifier{Tok: p.currTok, Value: p.currTok.Literal}
+	var node ast.Statement
+	var err error
+	if node, err = parseFn(p); err != nil {
+		p.errors = append(p.errors, err.Error())
+	}
+
+	return node
 }

@@ -6,36 +6,36 @@ import (
 	"goimpl/token"
 )
 
-type precidence int
-
-const (
-	_ precidence = iota
-	LOWEST
-	EQUALS      // ==
-	LESSGREATER // > or <
-	SUM         // +
-	PRODUCT     // *
-	PREFIX      // -X or !X
-	CALL        // myFunction(X)
-)
-
-var parseExpressionStatement parseStatement = func(p *Parser) (ast.Statement, error) {
+var parseExpressionStatement parseStatement = func(p *Parser) ast.Statement {
 	stmt := &ast.ExpressionStatement{Tok: p.currTok}
-	stmt.Exprssn, _ = parseExprWithPriority(p, LOWEST) //FIXME: handle error
+	stmt.Exprssn = parseExpr(p, LOWEST)
+	if stmt.Exprssn == nil {
+		p.errors = append(p.errors, fmt.Sprintf("could not parse expression statement"))
+		return nil
+	}
 	if p.peekTok.Type == token.SEMICOLON {
 		p.nextToken()
+		return stmt
 	}
-	return stmt, nil
-}
-
-func parseExprWithPriority(p *Parser, precedence precidence) (ast.Expression, error) {
-	prefix := p.prefixParseFns[p.currTok.Type]
-	if prefix == nil {
-		return nil, fmt.Errorf("no prefix parse function for %s found", p.currTok.Type)
-	}
-	return prefix(p), nil
+	return nil
 }
 
 var parseIdentifier prefixParseFn = func(parser *Parser) ast.Expression {
 	return &ast.Identifier{Tok: parser.currTok, Value: parser.currTok.Literal}
+}
+
+var parsePrefix prefixParseFn = func(parser *Parser) ast.Expression {
+	expr := &ast.PrefixExpression{Tok: parser.currTok, Operator: parser.currTok.Literal} //operator ex: ! or -
+	parser.nextToken()
+	expr.Right = parseExpr(parser, PREFIX) //parse the right side of the operator
+	return expr
+}
+
+var parseExpr parseExpression = func(p *Parser, precedence precidence) ast.Expression {
+	prefix := p.prefixParseFns[p.currTok.Type]
+	if prefix == nil {
+		p.errors = append(p.errors, fmt.Sprintf("no prefix parse function for %s found", p.currTok.Type))
+		return nil
+	}
+	return prefix(p)
 }

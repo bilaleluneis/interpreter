@@ -6,10 +6,10 @@ import (
 	"goimpl/token"
 )
 
-type parseStatement func(parser *Parser) (ast.Statement, error)
-type parseExpression func(parser *Parser) (ast.Expression, error)
-type prefixParseFn func(parser *Parser) ast.Expression
-type infixParseFn func(parser *Parser, exp ast.Expression) ast.Expression
+type parseStatement func(*Parser) ast.Statement
+type parseExpression func(*Parser, precidence) ast.Expression
+type prefixParseFn func(*Parser) ast.Expression
+type infixParseFn func(*Parser, ast.Expression) ast.Expression
 
 type Parser struct {
 	lexer          lexer.LexerType
@@ -74,16 +74,12 @@ func (p *Parser) parseStatement() ast.Statement {
 		parseFn = parseExpressionStatement
 	}
 
-	var node ast.Statement
-	var err error
-	if node, err = parseFn(p); err != nil {
-		p.errors = append(p.errors, err.Error())
-	}
-
-	return node
+	return parseFn(p)
 }
 
 func register(p *Parser) {
 	p.registerPrefix(token.IDENTIFIER, parseIdentifier)
 	p.registerPrefix(token.INT, parseInteger)
+	p.registerPrefix(token.BANG, parsePrefix)
+	p.registerPrefix(token.MINUS, parsePrefix)
 }

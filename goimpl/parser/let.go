@@ -6,15 +6,17 @@ import (
 	"goimpl/token"
 )
 
-var parseLetStatment parseStatement = func(p *Parser) (ast.Statement, error) {
+var parseLetStatment parseStatement = func(p *Parser) ast.Statement {
 	stmt := &ast.Let{Tok: p.currTok}
 	if p.peekTok.Type != token.IDENTIFIER {
-		return nil, fmt.Errorf("expected IDENTIFIER, got %s", p.peekTok.Type)
+		p.errors = append(p.errors, fmt.Sprintf("expected IDENTIFIER, got %s", p.peekTok.Type))
+		return nil
 	}
 	p.nextToken()
 	stmt.Name = &ast.Identifier{Tok: p.currTok, Value: p.currTok.Literal}
 	if p.peekTok.Type != token.ASSIGN {
-		return nil, fmt.Errorf("expected ASSIGN, got %s", p.peekTok.Type)
+		p.errors = append(p.errors, fmt.Sprintf("expected ASSIGN, got %s", p.peekTok.Type))
+		return nil
 	}
 
 	//FIXME: Implement the rest of the parsing logic
@@ -24,5 +26,5 @@ var parseLetStatment parseStatement = func(p *Parser) (ast.Statement, error) {
 		p.nextToken()
 	}
 
-	return stmt, nil
+	return stmt
 }

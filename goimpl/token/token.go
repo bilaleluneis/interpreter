@@ -24,6 +24,14 @@ const (
 	//Operators
 	ASSIGN TokenType = "="
 	PLUS   TokenType = "+"
+	MINUS  TokenType = "-"
+	BANG   TokenType = "!"
+	ASTER  TokenType = "*"
+	SLASH  TokenType = "/"
+	LT     TokenType = "<"
+	GT     TokenType = ">"
+	EQ     TokenType = "=="
+	NEQ    TokenType = "!="
 
 	//Delimeters
 	COMMA     TokenType = ","
@@ -37,4 +45,8 @@ const (
 	FUNCTION TokenType = "FUNCTION"
 	LET      TokenType = "LET"
 	RETURN   TokenType = "RETURN"
+	IF       TokenType = "IF"
+	ELSE     TokenType = "ELSE"
+	TRUE     TokenType = "TRUE"
+	FALSE    TokenType = "FALSE"
 )

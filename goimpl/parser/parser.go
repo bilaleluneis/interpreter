@@ -6,8 +6,6 @@ import (
 	"goimpl/token"
 )
 
-type parseStatement func(*Parser) ast.Statement
-type parseExpression func(*Parser, precidence) ast.Expression
 type prefixParseFn func(*Parser) ast.Expression
 type infixParseFn func(*Parser, ast.Expression) ast.Expression
 
@@ -27,27 +25,23 @@ func New(l lexer.LexerType) *Parser {
 		prefixParseFns: make(map[token.TokenType]prefixParseFn),
 		infixParseFns:  make(map[token.TokenType]infixParseFn),
 	}
-	register(p)
+
+	// Register prefix parse functions
+	p.registerPrefix(token.IDENTIFIER, parseIdentifierExpr)
+	p.registerPrefix(token.INT, parseIntegerLiteral)
+	p.registerPrefix(token.BANG, parsePrefixExpr)
+	p.registerPrefix(token.MINUS, parsePrefixExpr)
+
+	// Register infix parse functions
+	p.registerInfix(token.PLUS, parseInfixExpr)
+
 	p.currTok = p.lexer.NextToken()
 	p.peekTok = p.lexer.NextToken()
 	return p
 }
 
-func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
-	p.prefixParseFns[tokenType] = fn
-}
-
-func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
-	p.infixParseFns[tokenType] = fn
-}
-
 func (p *Parser) Errors() []string {
 	return p.errors
-}
-
-func (p *Parser) nextToken() {
-	p.currTok = p.peekTok
-	p.peekTok = p.lexer.NextToken()
 }
 
 func (p *Parser) ParseProgram() *ast.Program {
@@ -60,26 +54,4 @@ func (p *Parser) ParseProgram() *ast.Program {
 		p.nextToken()
 	}
 	return program
-}
-
-func (p *Parser) parseStatement() ast.Statement {
-	var parseFn = parseInvalid
-
-	switch p.currTok.Type {
-	case token.LET:
-		parseFn = parseLetStatment
-	case token.RETURN:
-		parseFn = parseReturnStatment
-	default:
-		parseFn = parseExpressionStatement
-	}
-
-	return parseFn(p)
-}
-
-func register(p *Parser) {
-	p.registerPrefix(token.IDENTIFIER, parseIdentifier)
-	p.registerPrefix(token.INT, parseInteger)
-	p.registerPrefix(token.BANG, parsePrefix)
-	p.registerPrefix(token.MINUS, parsePrefix)
 }

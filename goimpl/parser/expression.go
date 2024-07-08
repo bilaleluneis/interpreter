@@ -4,38 +4,53 @@ import (
 	"fmt"
 	"goimpl/ast"
 	"goimpl/token"
+	"strconv"
 )
 
-var parseExpressionStatement parseStatement = func(p *Parser) ast.Statement {
-	stmt := &ast.ExpressionStatement{Tok: p.currTok}
-	stmt.Exprssn = parseExpr(p, LOWEST)
-	if stmt.Exprssn == nil {
-		p.errors = append(p.errors, fmt.Sprintf("could not parse expression statement"))
-		return nil
-	}
-	if p.peekTok.Type == token.SEMICOLON {
-		p.nextToken()
-		return stmt
-	}
-	return nil
-}
-
-var parseIdentifier prefixParseFn = func(parser *Parser) ast.Expression {
-	return &ast.Identifier{Tok: parser.currTok, Value: parser.currTok.Literal}
-}
-
-var parsePrefix prefixParseFn = func(parser *Parser) ast.Expression {
-	expr := &ast.PrefixExpression{Tok: parser.currTok, Operator: parser.currTok.Literal} //operator ex: ! or -
-	parser.nextToken()
-	expr.Right = parseExpr(parser, PREFIX) //parse the right side of the operator
-	return expr
-}
-
-var parseExpr parseExpression = func(p *Parser, precedence precidence) ast.Expression {
+func (p *Parser) parseExpression(precedence precidence) ast.Expression {
 	prefix := p.prefixParseFns[p.currTok.Type]
 	if prefix == nil {
 		p.errors = append(p.errors, fmt.Sprintf("no prefix parse function for %s found", p.currTok.Type))
 		return nil
 	}
-	return prefix(p)
+	leftExpr := prefix(p)
+	for p.peekTok.Type != token.SEMICOLON && precedence < p.peekPrecidence() {
+		infix := p.infixParseFns[p.peekTok.Type]
+		if infix == nil {
+			return leftExpr
+		}
+		p.nextToken()
+		leftExpr = infix(p, leftExpr)
+	}
+	return leftExpr
+}
+
+var parseInfixExpr infixParseFn = func(parser *Parser, left ast.Expression) ast.Expression {
+	expr := &ast.InfixExpression{Tok: parser.currTok, Operator: parser.currTok.Literal, Left: left}
+	precedence := parser.currPrecidence()
+	parser.nextToken()
+	expr.Right = parser.parseExpression(precedence)
+	return expr
+}
+
+var parseIdentifierExpr prefixParseFn = func(parser *Parser) ast.Expression {
+	return &ast.Identifier{Tok: parser.currTok, Value: parser.currTok.Literal}
+}
+
+var parsePrefixExpr prefixParseFn = func(parser *Parser) ast.Expression {
+	expr := &ast.PrefixExpression{Tok: parser.currTok, Operator: parser.currTok.Literal} //operator ex: ! or -
+	parser.nextToken()
+	expr.Right = parser.parseExpression(PREFIX) //parse the right side of the operator
+	return expr
+}
+
+var parseIntegerLiteral prefixParseFn = func(parser *Parser) ast.Expression {
+	literal := &ast.IntegerLiteral{Tok: parser.currTok}
+	if value, err := strconv.ParseInt(parser.currTok.Literal, 0, 64); err == nil {
+		literal.Value = value
+		return literal
+	}
+	err := "could not parse " + parser.currTok.Literal + " as integer"
+	parser.errors = append(parser.errors, err)
+	return nil
 }

@@ -57,6 +57,5 @@ func TestInfix(t *testing.T) {
 		if infix.Right.String() != expectedRight {
 			t.Fatalf("infix.Right is not %s. got=%s", expectedRight, infix.Right.String())
 		}
-		program.Debug()
 	}
 }

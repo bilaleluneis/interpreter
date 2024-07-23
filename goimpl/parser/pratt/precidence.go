@@ -1,4 +1,4 @@
-package parser
+package pratt
 
 import "goimpl/token"
 
@@ -26,14 +26,14 @@ var precidenceMap = map[token.TokenType]precidence{
 	token.NEQ:   EQUALS,
 }
 
-func (p *Parser) peekPrecidence() precidence {
+func (p *PrattParser) peekPrecidence() precidence {
 	if p, ok := precidenceMap[p.peekTok.Type]; ok {
 		return p
 	}
 	return LOWEST
 }
 
-func (p *Parser) currPrecidence() precidence {
+func (p *PrattParser) currPrecidence() precidence {
 	if p, ok := precidenceMap[p.currTok.Type]; ok {
 		return p
 	}

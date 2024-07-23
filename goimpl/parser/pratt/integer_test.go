@@ -1,4 +1,4 @@
-package parser
+package pratt
 
 import (
 	"goimpl/ast"
@@ -6,11 +6,11 @@ import (
 	"testing"
 )
 
-func TestIdentifierExpression(t *testing.T) {
-	// foobar;
+func TestIntegerLiteralExpr(t *testing.T) {
+	// 5;
 	l := &stubLexer{
 		tokens: []token.Token{
-			{Type: token.IDENTIFIER, Literal: "foobar"},
+			{Type: token.INT, Literal: "5"},
 			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
@@ -26,14 +26,14 @@ func TestIdentifierExpression(t *testing.T) {
 	if !ok {
 		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T", program.Statements[0])
 	}
-	ident, ok := stmt.Exprssn.(*ast.Identifier) // expression statement is of type *ast.Identifier
+	integ, ok := stmt.Exprssn.(*ast.IntegerLiteral) // expression statement is of type *ast.IntegerLiteral
 	if !ok {
-		t.Fatalf("exp not *ast.Identifier. got=%T", stmt.Exprssn)
+		t.Fatalf("exp not *ast.IntegerLiteral. got=%T", stmt.Exprssn)
 	}
-	if ident.Value != "foobar" {
-		t.Fatalf("ident.Value not %s. got=%s", "foobar", ident.Value)
+	if integ.Value != 5 {
+		t.Fatalf("integ.Value not %d. got=%d", 5, integ.Value)
 	}
-	if ident.Tok.Literal != "foobar" {
-		t.Fatalf("ident.Tok.Literal not %s. got=%s", "foobar", ident.Tok.Literal)
+	if integ.TokenLiteral() != "5" {
+		t.Fatalf("integ.Tok.Literal not %s. got=%s", "5", integ.Tok.Literal)
 	}
 }

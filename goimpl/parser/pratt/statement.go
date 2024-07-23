@@ -1,4 +1,4 @@
-package parser
+package pratt
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"goimpl/token"
 )
 
-func (p *Parser) parseStatement() ast.Statement {
+func (p *PrattParser) parseStatement() ast.Statement {
 	switch p.currTok.Type {
 	case token.LET:
 		return p.parseLetStatment()
@@ -17,7 +17,7 @@ func (p *Parser) parseStatement() ast.Statement {
 	}
 }
 
-func (p *Parser) parseLetStatment() ast.Statement {
+func (p *PrattParser) parseLetStatment() ast.Statement {
 	stmt := &ast.Let{Tok: p.currTok}
 	if p.peekTok.Type != token.IDENTIFIER {
 		p.errors = append(p.errors, fmt.Sprintf("expected IDENTIFIER, got %s", p.peekTok.Type))
@@ -40,7 +40,7 @@ func (p *Parser) parseLetStatment() ast.Statement {
 	return stmt
 }
 
-func (p *Parser) parseReturnStatment() ast.Statement {
+func (p *PrattParser) parseReturnStatment() ast.Statement {
 	stmt := &ast.Return{Tok: p.currTok}
 	//FIXME: Implement the rest of the parsing logic, skipping expression at the moment
 	for p.nextToken(); p.currTok.Type != token.SEMICOLON; p.nextToken() {
@@ -48,12 +48,12 @@ func (p *Parser) parseReturnStatment() ast.Statement {
 	return stmt
 }
 
-func (p *Parser) invalidStatment() ast.Statement {
+func (p *PrattParser) invalidStatment() ast.Statement {
 	p.errors = append(p.errors, fmt.Sprintf("invalid token %s", p.currTok.Type))
 	return nil
 }
 
-func (p *Parser) parseExpressionStatement() ast.Statement {
+func (p *PrattParser) parseExpressionStatement() ast.Statement {
 	stmt := &ast.ExpressionStatement{Tok: p.currTok}
 	stmt.Exprssn = p.parseExpression(LOWEST)
 	if stmt.Exprssn == nil {

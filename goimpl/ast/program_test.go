@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"fmt"
 	"goimpl/token"
 	"testing"
 )
@@ -9,14 +10,16 @@ func TestProgram(t *testing.T) {
 	program := &Program{
 		Statements: []Statement{
 			simpleLet,
-			//letSimpleExpression,
+			letSimpleExpression,
 			letComplexExpression,
+			expressionStatement,
 		},
 	}
 
 	if program.TokenLiteral() != "let" {
 		t.Errorf("program.TokenLiteral not 'let'. got=%q", program.TokenLiteral())
 	}
+	fmt.Println(program)
 	program.Visualize()
 }
 
@@ -44,6 +47,11 @@ var letSimpleExpression Statement = &Let{
 		Left: &IntegerLiteral{
 			Tok:   token.Token{Type: token.INT, Literal: "5"},
 			Value: 5,
+		},
+		Tok:      token.Token{Type: token.PLUS, Literal: "+"},
+		Operator: "+",
+		Right: &IntegerLiteral{
+			Tok: token.Token{Type: token.INT, Literal: "10"},
 		},
 	},
 }
@@ -73,6 +81,22 @@ var letComplexExpression Statement = &Let{
 				Tok:   token.Token{Type: token.INT, Literal: "10"},
 				Value: 10,
 			},
+		},
+	},
+}
+
+// 5 + 10;
+var expressionStatement Statement = &ExpressionStatement{
+	Tok: token.Token{Type: token.INT, Literal: "5"},
+	Exprssn: &InfixExpression{
+		Left: &IntegerLiteral{
+			Tok:   token.Token{Type: token.INT, Literal: "5"},
+			Value: 5,
+		},
+		Tok:      token.Token{Type: token.PLUS, Literal: "+"},
+		Operator: "+",
+		Right: &IntegerLiteral{
+			Tok: token.Token{Type: token.INT, Literal: "10"},
 		},
 	},
 }

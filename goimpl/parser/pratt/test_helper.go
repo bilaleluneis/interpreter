@@ -1,4 +1,4 @@
-package parser
+package pratt
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ func (l *stubLexer) NextToken() token.Token {
 	return tok
 }
 
-func printErrs(p *Parser) {
+func printErrs(p *PrattParser) {
 	errors := p.Errors()
 	if len(errors) == 0 {
 		return

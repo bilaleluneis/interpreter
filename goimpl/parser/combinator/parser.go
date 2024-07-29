@@ -2,11 +2,14 @@ package combinator
 
 import (
 	"goimpl/ast"
-	"goimpl/parser"
+	"goimpl/lexer"
 )
 
-type CombinatorParser func(...parser.ParserType) parser.ParserType
+type CombinatorParser[L lexer.LexerType, A ast.Statement] func(L) (A, L)
 
-func (fp CombinatorParser) ParseProgram() *ast.Program {
-	return fp.ParseProgram()
+func (p *CombinatorParser[L, A]) ParseProgram() *ast.Program {
+	return &ast.Program{Statements: []ast.Statement{}}
 }
+
+// TODO: implement parse
+func parse[L lexer.LexerType, A ast.Statement](c CombinatorParser[L, A], l L) {}

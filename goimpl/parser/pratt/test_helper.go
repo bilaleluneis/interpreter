@@ -2,22 +2,7 @@ package pratt
 
 import (
 	"fmt"
-	"goimpl/token"
 )
-
-// stubLexer is a stub lexer for unit testing, conforms to the lexer.LexerType interface.
-type stubLexer struct {
-	tokens []token.Token
-}
-
-func (l *stubLexer) NextToken() token.Token {
-	if len(l.tokens) == 0 {
-		return token.Token{Type: token.EOF, Literal: ""}
-	}
-	tok := l.tokens[0]
-	l.tokens = l.tokens[1:]
-	return tok
-}
 
 func printErrs(p *PrattParser) {
 	errors := p.Errors()

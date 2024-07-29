@@ -3,6 +3,7 @@ package pratt
 import (
 	"goimpl/ast"
 	"goimpl/lexer"
+	"goimpl/parser"
 	"goimpl/token"
 	"testing"
 )
@@ -17,8 +18,8 @@ var prefixTests = []struct {
 	lexr             lexer.LexerType
 }{
 	// -5;
-	{"-", 5, &stubLexer{
-		tokens: []token.Token{
+	{"-", 5, &parser.StubLexer{
+		Toks: []token.Token{
 			{Type: token.MINUS, Literal: "-"},
 			{Type: token.INT, Literal: "5"},
 			{Type: token.SEMICOLON, Literal: ";"},
@@ -27,8 +28,8 @@ var prefixTests = []struct {
 	}},
 
 	// !5;
-	{"!", 5, &stubLexer{
-		tokens: []token.Token{
+	{"!", 5, &parser.StubLexer{
+		Toks: []token.Token{
 			{Type: token.BANG, Literal: "!"},
 			{Type: token.INT, Literal: "5"},
 			{Type: token.SEMICOLON, Literal: ";"},

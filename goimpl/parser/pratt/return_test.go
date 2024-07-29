@@ -1,6 +1,7 @@
 package pratt
 
 import (
+	"goimpl/parser"
 	"goimpl/token"
 	"testing"
 )
@@ -10,8 +11,8 @@ import (
 // returnStmt, ok := stmt.(*ast.ReturnStatement)
 func TestReturnStatment(t *testing.T) {
 	// return 5;
-	l := &stubLexer{
-		tokens: []token.Token{
+	l := &parser.StubLexer{
+		Toks: []token.Token{
 			{Type: token.RETURN, Literal: "return"},
 			{Type: token.INT, Literal: "5"},
 			{Type: token.SEMICOLON, Literal: ";"},

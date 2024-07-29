@@ -2,14 +2,15 @@ package pratt
 
 import (
 	"goimpl/ast"
+	"goimpl/parser"
 	"goimpl/token"
 	"testing"
 )
 
 func TestIntegerLiteralExpr(t *testing.T) {
 	// 5;
-	l := &stubLexer{
-		tokens: []token.Token{
+	l := &parser.StubLexer{
+		Toks: []token.Token{
 			{Type: token.INT, Literal: "5"},
 			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},

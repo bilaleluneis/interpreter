@@ -1,6 +1,7 @@
 package pratt
 
 import (
+	"goimpl/parser"
 	"goimpl/token"
 	"testing"
 )
@@ -8,8 +9,8 @@ import (
 func TestParseLetStatement(t *testing.T) {
 
 	// let x = 5;
-	l := &stubLexer{
-		tokens: []token.Token{
+	l := &parser.StubLexer{
+		Toks: []token.Token{
 			{Type: token.LET, Literal: "let"},
 			{Type: token.IDENTIFIER, Literal: "x"},
 			{Type: token.ASSIGN, Literal: "="},
@@ -32,8 +33,8 @@ func TestParseLetStatement(t *testing.T) {
 
 func TestParseLetStatementError(t *testing.T) {
 	// let x 5;
-	l := &stubLexer{
-		tokens: []token.Token{
+	l := &parser.StubLexer{
+		Toks: []token.Token{
 			{Type: token.LET, Literal: "let"},
 			{Type: token.IDENTIFIER, Literal: "x"},
 			{Type: token.INT, Literal: "5"},

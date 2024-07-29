@@ -2,14 +2,15 @@ package pratt
 
 import (
 	"goimpl/ast"
+	"goimpl/parser"
 	"goimpl/token"
 	"testing"
 )
 
 func TestIdentifierExpression(t *testing.T) {
 	// foobar;
-	l := &stubLexer{
-		tokens: []token.Token{
+	l := &parser.StubLexer{
+		Toks: []token.Token{
 			{Type: token.IDENTIFIER, Literal: "foobar"},
 			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},

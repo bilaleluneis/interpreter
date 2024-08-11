@@ -1,14 +1,5 @@
-[package]
-name = "rustimpl"
-version = "0.1.0"
-edition = "2021"
+[workspace]
 
-[[bin]]
-name = "rustimpl"
+members = ["parser","scanner"]
 
-[lib]
-name = "rustimpl"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
+resolver = "2" # use 2021 edition as default for all crates

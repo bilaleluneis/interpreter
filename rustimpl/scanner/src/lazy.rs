@@ -1,35 +1,43 @@
-use crate::token::Token;
 use std::str;
 
+use crate::lexer::Lexer;
+use crate::token::Token;
 
-#[derive(Debug)]
-pub struct Lexer {
-    input: String,
+pub struct LazyLexer<'a> {
+    input: &'a str,
     prev_read_position: usize,
     next_read_position: usize,
     ch_under_inspection: u8,
 }
 
-impl Lexer {
-    pub fn new(input: String) -> Self {
-        Lexer {
-            input,
-            prev_read_position: 0,
-            next_read_position: 0,
-            ch_under_inspection: 0u8,
-        }
-    }
+impl<'a> Clone for LazyLexer<'a> {
+    fn clone(&self) -> Self { *self }
+}
 
-    pub fn next_token(&mut self) -> Token {
+impl<'a> Copy for LazyLexer<'a> {}
+
+impl<'a> Lexer for LazyLexer<'a> {
+    fn next_token(&mut self) -> Token {
         while self.peek().is_ascii_whitespace() {
             self.advance()
         }
 
         match self.next_char().as_str() {
-            ch if ch.is_empty() => Token::Eof,
+            ch if str::is_empty(ch) => Token::Eof,
             ch if ch.chars().all(char::is_alphabetic) => self.literal_token(),
             ch if ch.chars().all(char::is_numeric) => self.numeric_token(),
             ch => Token::lookup(ch),
+        }
+    }
+}
+
+impl<'a> LazyLexer<'a> {
+    pub fn new(input: &'a str) -> Self {
+        LazyLexer {
+            input,
+            prev_read_position: 0,
+            next_read_position: 0,
+            ch_under_inspection: 0u8,
         }
     }
 
@@ -86,12 +94,13 @@ impl Lexer {
 
 #[cfg(test)]
 mod tests {
+    use crate::lazy::LazyLexer;
     use crate::lexer::Lexer;
     use crate::token::Token;
 
     #[test]
     fn basic_lexing() {
-        let mut lexer = Lexer::new("=+,;(){}".to_string());
+        let mut lexer = LazyLexer::new("=+,;(){}");
         let expected_tokens = [
             Token::Assign,
             Token::Plus,
@@ -110,12 +119,12 @@ mod tests {
 
     #[test]
     fn min_lang_construct() {
-        let mut lexer = Lexer::new(r#"
+        let mut lexer = LazyLexer::new(r#"
             let five = 5;
             let ten = 10;
             let add = fn(x, y) { x + y};
             let result = add(five, ten);
-        "#.to_string());
+        "#);
 
         let expected_tokens = [
             // let five = 5;
@@ -160,7 +169,6 @@ mod tests {
             Token::Ident("ten".to_string()),
             Token::Rparen,
             Token::Semicolon,
-
             Token::Eof
         ];
         for expected_tok in expected_tokens {

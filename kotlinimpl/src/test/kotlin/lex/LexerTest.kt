@@ -8,7 +8,7 @@ internal class LexerTest {
 
     @Test
     fun basicLexing() {
-        val lexer = Lexer("=+,;(){}")
+        val lexer = LazyLexer("=+,;(){}")
         arrayOf(
             Assign,
             Plus,
@@ -30,7 +30,7 @@ internal class LexerTest {
             let add = fn(x,y) { x + y};
             let result = add(five, ten);
             """
-        val lexer = Lexer(input)
+        val lexer = LazyLexer(input)
         arrayOf(
             // let five = 5;
             Let,

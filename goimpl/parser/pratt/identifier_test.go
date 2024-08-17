@@ -2,22 +2,21 @@ package pratt
 
 import (
 	"goimpl/ast"
-	"goimpl/parser"
+	"goimpl/lexer"
 	"goimpl/token"
 	"testing"
 )
 
 func TestIdentifierExpression(t *testing.T) {
-	// foobar;
-	l := &parser.StubLexer{
-		Toks: []token.Token{
-			{Type: token.IDENTIFIER, Literal: "foobar"},
-			{Type: token.SEMICOLON, Literal: ";"},
-			{Type: token.EOF, Literal: ""},
-		},
+	tokens := []token.Token{
+		{Type: token.IDENTIFIER, Literal: "foobar"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.EOF, Literal: ""},
 	}
 
-	p := New(l)
+	l := lexer.NewStubLexer(tokens)
+
+	p := New(&l)
 	program := p.ParseProgram()
 	printErrs(p)
 	if len(program.Statements) != 1 {

@@ -3,7 +3,6 @@ package pratt
 import (
 	"goimpl/ast"
 	"goimpl/lexer"
-	"goimpl/parser"
 	"goimpl/token"
 	"testing"
 )
@@ -15,27 +14,21 @@ import (
 var prefixTests = []struct {
 	expectedOperator string
 	expectedValue    int64
-	lexr             lexer.LexerType
+	lexr             lexer.StubLexer
 }{
 	// -5;
-	{"-", 5, &parser.StubLexer{
-		Toks: []token.Token{
-			{Type: token.MINUS, Literal: "-"},
-			{Type: token.INT, Literal: "5"},
-			{Type: token.SEMICOLON, Literal: ";"},
-			{Type: token.EOF, Literal: ""},
-		},
-	}},
+	{"-", 5, lexer.NewStubLexer([]token.Token{
+		{Type: token.MINUS, Literal: "-"},
+		{Type: token.INT, Literal: "5"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.EOF, Literal: ""}})},
 
 	// !5;
-	{"!", 5, &parser.StubLexer{
-		Toks: []token.Token{
-			{Type: token.BANG, Literal: "!"},
-			{Type: token.INT, Literal: "5"},
-			{Type: token.SEMICOLON, Literal: ";"},
-			{Type: token.EOF, Literal: ""},
-		},
-	}},
+	{"!", 5, lexer.StubLexer([]token.Token{
+		{Type: token.BANG, Literal: "!"},
+		{Type: token.INT, Literal: "5"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.EOF, Literal: ""}})},
 }
 
 func TestPrefix(t *testing.T) {
@@ -43,7 +36,7 @@ func TestPrefix(t *testing.T) {
 		expectedOperator := tt.expectedOperator
 		expectedValue := tt.expectedValue
 		lexr := tt.lexr
-		p := New(lexr)
+		p := New(&lexr)
 		program := p.ParseProgram()
 		if len(p.Errors()) > 0 {
 			printErrs(p)

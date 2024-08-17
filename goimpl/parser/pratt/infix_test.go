@@ -3,7 +3,6 @@ package pratt
 import (
 	"goimpl/ast"
 	"goimpl/lexer"
-	"goimpl/parser"
 	"goimpl/token"
 	"testing"
 )
@@ -12,18 +11,16 @@ var infixTests = []struct {
 	expectedLeft  string
 	expectedOp    string
 	expectedRight string
-	lexr          lexer.LexerType
+	lexr          lexer.StubLexer
 }{
 	// 5 + 5;
-	{"5", "+", "5", &parser.StubLexer{
-		Toks: []token.Token{
-			{Type: token.INT, Literal: "5"},
-			{Type: token.PLUS, Literal: "+"},
-			{Type: token.INT, Literal: "5"},
-			{Type: token.SEMICOLON, Literal: ";"},
-			{Type: token.EOF, Literal: ""},
-		},
-	}},
+	{"5", "+", "5", lexer.NewStubLexer([]token.Token{
+		{Type: token.INT, Literal: "5"},
+		{Type: token.PLUS, Literal: "+"},
+		{Type: token.INT, Literal: "5"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.EOF, Literal: ""},
+	})},
 }
 
 func TestInfix(t *testing.T) {
@@ -32,7 +29,7 @@ func TestInfix(t *testing.T) {
 		expectedOp := tt.expectedOp
 		expectedRight := tt.expectedRight
 		lexr := tt.lexr
-		p := New(lexr)
+		p := New(&lexr)
 		program := p.ParseProgram()
 		if len(p.Errors()) > 0 {
 			printErrs(p)

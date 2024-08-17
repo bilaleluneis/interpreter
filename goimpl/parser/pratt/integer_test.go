@@ -2,22 +2,20 @@ package pratt
 
 import (
 	"goimpl/ast"
-	"goimpl/parser"
+	"goimpl/lexer"
 	"goimpl/token"
 	"testing"
 )
 
 func TestIntegerLiteralExpr(t *testing.T) {
 	// 5;
-	l := &parser.StubLexer{
-		Toks: []token.Token{
-			{Type: token.INT, Literal: "5"},
-			{Type: token.SEMICOLON, Literal: ";"},
-			{Type: token.EOF, Literal: ""},
-		},
-	}
+	l := lexer.NewStubLexer([]token.Token{
+		{Type: token.INT, Literal: "5"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.EOF, Literal: ""},
+	})
 
-	p := New(l)
+	p := New(&l)
 	program := p.ParseProgram()
 	printErrs(p)
 	if len(program.Statements) != 1 {

@@ -8,7 +8,7 @@ import (
 )
 
 type PrattParser struct {
-	lexer          lexer.LexerType
+	lexer          lexer.Lexer
 	currTok        token.Token
 	peekTok        token.Token
 	errors         []string
@@ -16,7 +16,7 @@ type PrattParser struct {
 	infixParseFns  map[token.TokenType]parser.InfixParseFn
 }
 
-func New(l lexer.LexerType) *PrattParser {
+func New(l lexer.Lexer) *PrattParser {
 	p := &PrattParser{
 		lexer:          l,
 		errors:         []string{},

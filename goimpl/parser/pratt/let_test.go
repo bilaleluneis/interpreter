@@ -1,7 +1,7 @@
 package pratt
 
 import (
-	"goimpl/parser"
+	"goimpl/lexer"
 	"goimpl/token"
 	"testing"
 )
@@ -9,18 +9,16 @@ import (
 func TestParseLetStatement(t *testing.T) {
 
 	// let x = 5;
-	l := &parser.StubLexer{
-		Toks: []token.Token{
-			{Type: token.LET, Literal: "let"},
-			{Type: token.IDENTIFIER, Literal: "x"},
-			{Type: token.ASSIGN, Literal: "="},
-			{Type: token.INT, Literal: "5"},
-			{Type: token.SEMICOLON, Literal: ";"},
-			{Type: token.EOF, Literal: ""},
-		},
-	}
+	l := lexer.NewStubLexer([]token.Token{
+		{Type: token.LET, Literal: "let"},
+		{Type: token.IDENTIFIER, Literal: "x"},
+		{Type: token.ASSIGN, Literal: "="},
+		{Type: token.INT, Literal: "5"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.EOF, Literal: ""},
+	})
 
-	p := New(l)
+	p := New(&l)
 	program := p.ParseProgram()
 	if len(p.Errors()) > 0 {
 		printErrs(p)
@@ -33,17 +31,15 @@ func TestParseLetStatement(t *testing.T) {
 
 func TestParseLetStatementError(t *testing.T) {
 	// let x 5;
-	l := &parser.StubLexer{
-		Toks: []token.Token{
-			{Type: token.LET, Literal: "let"},
-			{Type: token.IDENTIFIER, Literal: "x"},
-			{Type: token.INT, Literal: "5"},
-			{Type: token.SEMICOLON, Literal: ";"},
-			{Type: token.EOF, Literal: ""},
-		},
-	}
+	l := lexer.NewStubLexer([]token.Token{
+		{Type: token.LET, Literal: "let"},
+		{Type: token.IDENTIFIER, Literal: "x"},
+		{Type: token.INT, Literal: "5"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.EOF, Literal: ""},
+	})
 
-	p := New(l)
+	p := New(&l)
 	_ = p.ParseProgram()
 	if len(p.Errors()) == 0 {
 		t.Fatalf("expected error")

@@ -90,11 +90,7 @@ type expectedToken struct {
 }
 
 func testLexer(input string, tests []expectedToken, t *testing.T) {
-	l, ok := New(input)
-	if !ok {
-		t.Fatalf("lexer failed to init")
-	}
-
+	l := NewLazyLexer(input)
 	for i, tokTest := range tests {
 		tok := l.NextToken()
 

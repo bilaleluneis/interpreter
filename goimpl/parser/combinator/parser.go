@@ -3,13 +3,50 @@ package combinator
 import (
 	"goimpl/ast"
 	"goimpl/lexer"
+	"goimpl/token"
 )
 
-type CombinatorParser[L lexer.LexerType, A ast.Statement] func(L) (A, L)
+// TODO: create constraint for PT type
 
-func (p *CombinatorParser[L, A]) ParseProgram() *ast.Program {
+type LPT[L any] interface {
+	lexer.Lexer
+	GetCopy() *L //FIXME: VType[L] interface returns L for GetCopy() instead of *L
+	*L
+}
+
+type CombinatorParser[L any, PT interface {
+	NextToken() token.Token
+	GetCopy() *L
+	*L
+}] func(L) (ast.Statement, L)
+
+func (p *CombinatorParser[L, PT]) ParseProgram() *ast.Program {
 	return &ast.Program{Statements: []ast.Statement{}}
 }
 
-// TODO: implement parse
-func parse[L lexer.LexerType, A ast.Statement](c CombinatorParser[L, A], l L) {}
+type ParseResult[L any, PT interface {
+	NextToken() token.Token
+	GetCopy() *L
+	*L
+}] struct {
+	Lxr   L
+	Stmnt ast.Statement
+}
+
+func (pr ParseResult[L, PT]) Parse(cparser ...CombinatorParser[L, PT]) []ParseResult[L, PT] {
+	var results []ParseResult[L, PT]
+	for _, parser := range cparser {
+		cl := PT(&pr.Lxr).GetCopy()
+		stmnt, lxrResult := parser(*cl)
+		results = append(results, ParseResult[L, PT]{Lxr: lxrResult, Stmnt: stmnt})
+	}
+	return results
+}
+
+func NewParseResult[L any, PT interface {
+	NextToken() token.Token
+	GetCopy() *L
+	*L
+}](l L) ParseResult[L, PT] {
+	return ParseResult[L, PT]{Lxr: l}
+}

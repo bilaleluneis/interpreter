@@ -2,10 +2,13 @@ package combinator
 
 import (
 	"goimpl/ast"
-	"goimpl/lexer"
+	"goimpl/token"
 )
 
-var Fail CombinatorParser[lexer.LexerType, ast.Error] = func(l lexer.LexerType) (ast.Error, lexer.LexerType) {
-	var astErr ast.Error
-	return astErr, l
+func Fail[L any, PT interface {
+	NextToken() token.Token
+	GetCopy() *L
+	*L
+}](l L) (ast.Statement, L) {
+	return ast.Error{Message: "failed to lex"}, l
 }

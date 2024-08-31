@@ -7,7 +7,7 @@ import (
 
 func Fail[L any, PT interface {
 	NextToken() token.Token
-	GetCopy() *L
+	GetCopy() L
 	*L
 }](l L) (ast.Statement, L) {
 	return ast.Error{Message: "failed to lex"}, l

@@ -10,13 +10,13 @@ import (
 
 type LPT[L any] interface {
 	lexer.Lexer
-	GetCopy() *L //FIXME: VType[L] interface returns L for GetCopy() instead of *L
+	GetCopy() L
 	*L
 }
 
 type CombinatorParser[L any, PT interface {
 	NextToken() token.Token
-	GetCopy() *L
+	GetCopy() L
 	*L
 }] func(L) (ast.Statement, L)
 
@@ -26,7 +26,7 @@ func (p *CombinatorParser[L, PT]) ParseProgram() *ast.Program {
 
 type ParseResult[L any, PT interface {
 	NextToken() token.Token
-	GetCopy() *L
+	GetCopy() L
 	*L
 }] struct {
 	Lxr   L
@@ -37,7 +37,7 @@ func (pr ParseResult[L, PT]) Parse(cparser ...CombinatorParser[L, PT]) []ParseRe
 	var results []ParseResult[L, PT]
 	for _, parser := range cparser {
 		cl := PT(&pr.Lxr).GetCopy()
-		stmnt, lxrResult := parser(*cl)
+		stmnt, lxrResult := parser(cl)
 		results = append(results, ParseResult[L, PT]{Lxr: lxrResult, Stmnt: stmnt})
 	}
 	return results
@@ -45,7 +45,7 @@ func (pr ParseResult[L, PT]) Parse(cparser ...CombinatorParser[L, PT]) []ParseRe
 
 func NewParseResult[L any, PT interface {
 	NextToken() token.Token
-	GetCopy() *L
+	GetCopy() L
 	*L
 }](l L) ParseResult[L, PT] {
 	return ParseResult[L, PT]{Lxr: l}

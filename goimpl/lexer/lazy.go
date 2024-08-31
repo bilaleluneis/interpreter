@@ -13,8 +13,8 @@ func NewLazyLexer(input string) LazyLexer {
 	return LazyLexer{input: input}
 }
 
-func (l *LazyLexer) GetCopy() *LazyLexer {
-	lcopy := &LazyLexer{input: l.input}
+func (l LazyLexer) GetCopy() LazyLexer {
+	lcopy := LazyLexer{input: l.input}
 	lcopy.prevReadIndx = l.prevReadIndx
 	lcopy.nextReadIndex = l.nextReadIndex
 	lcopy.charUnderInspection = l.charUnderInspection

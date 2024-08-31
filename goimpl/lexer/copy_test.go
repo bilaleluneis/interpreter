@@ -1,10 +1,11 @@
 package lexer
 
 import "testing"
+import "goimpl/common"
 
 func TestLexerCopy(t *testing.T) {
 	lexer := NewLazyLexer("let five = 5;")
-	lexerCopy := CopyOf(&lexer)
+	lexerCopy := common.CopyOf(lexer)
 	lexerCopy.NextToken() // let
 	if lexerCopy.NextToken().Literal != "five" {
 		t.Fatal("lexerCopy shuld have returned 'five'")
@@ -12,7 +13,7 @@ func TestLexerCopy(t *testing.T) {
 	if lexer.NextToken().Literal != "let" {
 		t.Fatal("lexerCopy should not affect original lexer")
 	}
-	if &lexer == lexerCopy {
+	if &lexer == &lexerCopy {
 		t.Fatal("lexer and lexerCopy should be different instances")
 	}
 }

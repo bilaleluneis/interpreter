@@ -19,7 +19,7 @@ func TestFail(t *testing.T) {
 	// - run with multiple combinators and check that you get always diff lexer instance
 	// - check that orginal lexer is not mutated
 	// - use iterator to go over combinators
-	pr := NewParseResult[lexer.StubLexer](l)
+	pr := NewParseResult(l)
 	result := pr.Parse(Fail[lexer.StubLexer])
 	if len(result) == 0 {
 		t.Fatalf("expected error")

@@ -10,6 +10,8 @@ type Lexer interface {
 	NextToken() token.Token
 }
 
-func CopyOf[V common.VType[L], L Lexer](lexer V) L {
-	return lexer.GetCopy()
+type CopyableLexer[T any] interface {
+	Lexer
+	common.VType[T]
+	*T
 }

@@ -1,12 +1,14 @@
 package combinator
 
 import (
+	"goimpl/ast"
 	"goimpl/lexer"
 	"goimpl/token"
 	"testing"
 )
 
-func TestFail(t *testing.T) {
+func TestLet(t *testing.T) {
+	//let x = 5;
 	l := lexer.NewStubLexer([]token.Token{
 		{Type: token.LET, Literal: "let"},
 		{Type: token.IDENTIFIER, Literal: "x"},
@@ -16,9 +18,11 @@ func TestFail(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	pr := NewParseResult[lexer.StubLexer](l)
-	result := pr.Parse(Fail[lexer.StubLexer])
-	if len(result) == 0 {
-		t.Fatalf("expected error")
+	pr := NewParseResult(l)
+	parseResult := pr.Parse(Let[lexer.StubLexer])
+	filterResult := Filtr(parseResult, func(s ast.Statement) bool { return s.TokenLiteral() == "let" })
+	if len(filterResult) != 1 {
+		t.Fatal("filter should return one result got", len(filterResult))
 	}
+
 }

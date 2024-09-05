@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func printErrs(p *PrattParser) {
+func printErrs(p *Parser) {
 	errors := p.Errors()
 	if len(errors) == 0 {
 		return

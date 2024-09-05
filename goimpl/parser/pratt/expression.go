@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func (p *PrattParser) parseExpression(precedence precidence) ast.Expression {
+func (p *Parser) parseExpression(precedence precidence) ast.Expression {
 	prefix := p.prefixParseFns[p.currTok.Type]
 	if prefix == nil {
 		p.errors = append(p.errors, fmt.Sprintf("no prefix parse function for %s found", p.currTok.Type))
@@ -27,7 +27,7 @@ func (p *PrattParser) parseExpression(precedence precidence) ast.Expression {
 }
 
 var parseInfixExpr parser.InfixParseFn = func(parser parser.ParserType, left ast.Expression) ast.Expression {
-	if prttParser, ok := parser.(*PrattParser); ok {
+	if prttParser, ok := parser.(*Parser); ok {
 		expr := &ast.InfixExpression{Tok: prttParser.currTok, Operator: prttParser.currTok.Literal, Left: left}
 		precedence := prttParser.currPrecidence()
 		prttParser.nextToken()
@@ -38,14 +38,14 @@ var parseInfixExpr parser.InfixParseFn = func(parser parser.ParserType, left ast
 }
 
 var parseIdentifierExpr parser.PrefixParseFn = func(parser parser.ParserType) ast.Expression {
-	if prttParser, ok := parser.(*PrattParser); ok {
+	if prttParser, ok := parser.(*Parser); ok {
 		return &ast.Identifier{Tok: prttParser.currTok, Value: prttParser.currTok.Literal}
 	}
 	return nil
 }
 
 var parsePrefixExpr parser.PrefixParseFn = func(parser parser.ParserType) ast.Expression {
-	if prttParser, ok := parser.(*PrattParser); ok {
+	if prttParser, ok := parser.(*Parser); ok {
 		expr := &ast.PrefixExpression{Tok: prttParser.currTok, Operator: prttParser.currTok.Literal} //operator ex: ! or -
 		prttParser.nextToken()
 		expr.Right = prttParser.parseExpression(PREFIX) //parse the right side of the operator
@@ -55,7 +55,7 @@ var parsePrefixExpr parser.PrefixParseFn = func(parser parser.ParserType) ast.Ex
 }
 
 var parseIntegerLiteral parser.PrefixParseFn = func(parser parser.ParserType) ast.Expression {
-	if prttParser, ok := parser.(*PrattParser); ok {
+	if prttParser, ok := parser.(*Parser); ok {
 		literal := &ast.IntegerLiteral{Tok: prttParser.currTok}
 		if value, err := strconv.ParseInt(prttParser.currTok.Literal, 0, 64); err == nil {
 			literal.Value = value

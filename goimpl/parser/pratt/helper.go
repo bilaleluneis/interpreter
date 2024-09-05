@@ -5,15 +5,15 @@ import (
 	"goimpl/token"
 )
 
-func (p *PrattParser) nextToken() {
+func (p *Parser) nextToken() {
 	p.currTok = p.peekTok
 	p.peekTok = p.lexer.NextToken()
 }
 
-func (p *PrattParser) registerPrefix(tokenType token.TokenType, fn parser.PrefixParseFn) {
+func (p *Parser) registerPrefix(tokenType token.TokenType, fn parser.PrefixParseFn) {
 	p.prefixParseFns[tokenType] = fn
 }
 
-func (p *PrattParser) registerInfix(tokenType token.TokenType, fn parser.InfixParseFn) {
+func (p *Parser) registerInfix(tokenType token.TokenType, fn parser.InfixParseFn) {
 	p.infixParseFns[tokenType] = fn
 }

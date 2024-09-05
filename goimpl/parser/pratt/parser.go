@@ -7,7 +7,7 @@ import (
 	"goimpl/token"
 )
 
-type PrattParser struct {
+type Parser struct {
 	lexer          lexer.Lexer
 	currTok        token.Token
 	peekTok        token.Token
@@ -16,8 +16,8 @@ type PrattParser struct {
 	infixParseFns  map[token.TokenType]parser.InfixParseFn
 }
 
-func New(l lexer.Lexer) *PrattParser {
-	p := &PrattParser{
+func New(l lexer.Lexer) *Parser {
+	p := &Parser{
 		lexer:          l,
 		errors:         []string{},
 		prefixParseFns: make(map[token.TokenType]parser.PrefixParseFn),
@@ -38,11 +38,11 @@ func New(l lexer.Lexer) *PrattParser {
 	return p
 }
 
-func (p *PrattParser) Errors() []string {
+func (p *Parser) Errors() []string {
 	return p.errors
 }
 
-func (p *PrattParser) ParseProgram() *ast.Program {
+func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{Statements: []ast.Statement{}}
 	for p.currTok.Type != token.EOF {
 		stmt := p.parseStatement()

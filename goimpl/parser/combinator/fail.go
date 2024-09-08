@@ -5,6 +5,6 @@ import (
 	"goimpl/lexer"
 )
 
-func Fail[L any, _ lexer.CopyableLexer[L]](l L) (ast.Statement, L) {
-	return ast.Error{Message: "failed to lex"}, l
+func Fail[L any, CL lexer.CopyableLexer[L]](l L) Result[L, CL] {
+	return Result[L, CL]{l, ast.Error{Message: "Failed to Parse"}}
 }

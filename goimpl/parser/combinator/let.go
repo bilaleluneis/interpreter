@@ -6,8 +6,7 @@ import (
 	"goimpl/token"
 )
 
-func Let[L any, CL lexer.CopyableLexer[L]](l L) (ast.Statement, L) {
-	failure, currLexer := Fail[L, CL](CL(&l).GetCopy()) // on failure return this
+func Let[L any, CL lexer.CopyableLexer[L]](l L) Result[L, CL] {
 	letLexr := CL(&l)
 	if letTok := letLexr.NextToken(); letTok.Type == token.LET {
 		letStmnt := ast.Let{Tok: letTok}
@@ -20,7 +19,7 @@ func Let[L any, CL lexer.CopyableLexer[L]](l L) (ast.Statement, L) {
 				}
 			}
 		}
-		return letStmnt, letLexr.GetCopy()
+		return Result[L, CL]{*letLexr, letStmnt}
 	}
-	return failure, currLexer
+	return Result[L, CL]{l, &ast.Error{Message: "Failed to parse let statement"}}
 }

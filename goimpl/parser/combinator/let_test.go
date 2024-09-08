@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestLet(t *testing.T) {
+func TestLetFunc(t *testing.T) {
 	//let x = 5;
 	l := lexer.NewStubLexer([]token.Token{
 		{Type: token.LET, Literal: "let"},
@@ -18,11 +18,52 @@ func TestLet(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	pr := NewParseResult(l)
-	parseResult := pr.Parse(Let[lexer.StubLexer])
-	filterResult := Filtr(parseResult, func(s ast.Statement) bool { return s.TokenLiteral() == "let" })
-	if len(filterResult) != 1 {
-		t.Fatal("filter should return one result got", len(filterResult))
+	// call the Let function and pass copy of lexer
+	// similar to what combinator.Parser.parse() does
+	result := Let(l.GetCopy())
+
+	// check that the lexer we got back is not same instance as passed
+	if &l == &result.lxr {
+		t.Fatalf("expected different lexer instance got same")
 	}
 
+	// check that the original lexer is not advanced
+	if l.NextToken().Type != token.LET {
+		t.Fatalf("original lexer has advanced")
+	}
+
+	// check that lexer we got back emits token.EOF on advance
+	if result.lxr.NextToken().Type != token.EOF {
+		t.Fatalf("expected EOF got %s", result.lxr.NextToken().Literal)
+	}
+
+	// check that the statement is a let statement
+	if _, ok := result.stmnt.(ast.Let); !ok {
+		t.Fatalf("expected let statement got %T", result.stmnt)
+	}
+	//TODO: might want to check the values of the let statement
+}
+
+func TestLetParse(t *testing.T) {
+	//let x = 5;
+	l := lexer.NewStubLexer([]token.Token{
+		{Type: token.LET, Literal: "let"},
+		{Type: token.IDENTIFIER, Literal: "x"},
+		{Type: token.ASSIGN, Literal: "="},
+		{Type: token.INT, Literal: "5"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.EOF, Literal: ""},
+	})
+
+	result := NewParser(l, Let[lexer.StubLexer]).ParseProgram()
+
+	// check that we got one statment
+	if len(result.Statements) != 1 {
+		t.Fatalf("expected 1 statement got %d", len(result.Statements))
+	}
+
+	// check that the statement is a let statement
+	if _, ok := result.Statements[0].(ast.Let); !ok {
+		t.Fatalf("expected let statement got %T", result.Statements[0])
+	}
 }

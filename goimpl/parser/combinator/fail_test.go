@@ -49,7 +49,7 @@ func TestFailParse(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	result := NewParser(l, Fail[lexer.StubLexer]).ParseProgram()
+	result := New(l, Fail[lexer.StubLexer]).ParseProgram()
 
 	// check that we got one statment
 	if len(result.Statements) != 1 {

@@ -74,6 +74,6 @@ func (p Parser[L, CL]) isEof(currLxr L) bool {
 	return CL(&cp).NextToken().Type == token.EOF
 }
 
-func NewParser[L any, CL lexer.CopyableLexer[L]](lexer L, parsers ...ParserFunc[L, CL]) Parser[L, CL] {
+func New[L any, CL lexer.CopyableLexer[L]](lexer L, parsers ...ParserFunc[L, CL]) Parser[L, CL] {
 	return Parser[L, CL]{currLexer: lexer, parsers: parsers}
 }

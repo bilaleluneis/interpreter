@@ -55,7 +55,7 @@ func TestLetParse(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	result := NewParser(l, Let[lexer.StubLexer]).ParseProgram()
+	result := New(l, Let[lexer.StubLexer]).ParseProgram()
 
 	// check that we got one statment
 	if len(result.Statements) != 1 {

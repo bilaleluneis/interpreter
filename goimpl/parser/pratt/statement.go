@@ -3,6 +3,7 @@ package pratt
 import (
 	"fmt"
 	"goimpl/ast"
+	"goimpl/parser/internal"
 	"goimpl/token"
 )
 
@@ -54,15 +55,13 @@ func (p *Parser) invalidStatment() ast.Statement {
 }
 
 func (p *Parser) parseExpressionStatement() ast.Statement {
-	stmt := &ast.ExpressionStatement{Tok: p.currTok}
-	stmt.Exprssn = p.parseExpression(LOWEST)
-	if stmt.Exprssn == nil {
-		p.errors = append(p.errors, fmt.Sprintf("could not parse expression statement"))
-		return nil
+	if expression := p.parseExpression(internal.LOWEST); expression != nil {
+		stmt := &ast.ExpressionStatement{Tok: p.currTok, Exprssn: expression}
+		if p.peekTok.Type == token.SEMICOLON {
+			p.nextToken()
+			return stmt
+		}
 	}
-	if p.peekTok.Type == token.SEMICOLON {
-		p.nextToken()
-		return stmt
-	}
+	p.errors = append(p.errors, fmt.Sprintf("could not parse expression statement"))
 	return nil
 }

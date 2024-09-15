@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"goimpl/ast"
 	"goimpl/parser"
+	"goimpl/parser/internal"
 	"goimpl/token"
 	"strconv"
 )
 
-func (p *Parser) parseExpression(precedence precidence) ast.Expression {
+func (p *Parser) parseExpression(precedence internal.Precidence) ast.Expression {
 	prefix := p.prefixParseFns[p.currTok.Type]
 	if prefix == nil {
 		p.errors = append(p.errors, fmt.Sprintf("no prefix parse function for %s found", p.currTok.Type))
@@ -48,7 +49,7 @@ var parsePrefixExpr parser.PrefixParseFn = func(parser parser.ParserType) ast.Ex
 	if prttParser, ok := parser.(*Parser); ok {
 		expr := &ast.PrefixExpression{Tok: prttParser.currTok, Operator: prttParser.currTok.Literal} //operator ex: ! or -
 		prttParser.nextToken()
-		expr.Right = prttParser.parseExpression(PREFIX) //parse the right side of the operator
+		expr.Right = prttParser.parseExpression(internal.PREFIX) //parse the right side of the operator
 		return expr
 	}
 	return nil

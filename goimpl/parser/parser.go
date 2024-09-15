@@ -1,8 +1,6 @@
 package parser
 
-import (
-	"goimpl/ast"
-)
+import "goimpl/ast"
 
 type ParserType interface {
 	ParseProgram() *ast.Program

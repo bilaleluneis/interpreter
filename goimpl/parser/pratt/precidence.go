@@ -1,41 +1,17 @@
 package pratt
 
-import "goimpl/token"
+import "goimpl/parser/internal"
 
-type precidence int
-
-const (
-	_ precidence = iota
-	LOWEST
-	EQUALS      // ==
-	LESSGREATER // > or <
-	SUM         // +
-	PRODUCT     // *
-	PREFIX      // -X or !X
-	CALL        // myFunction(X)
-)
-
-var precidenceMap = map[token.TokenType]precidence{
-	token.PLUS:  SUM,
-	token.MINUS: SUM,
-	token.SLASH: PRODUCT,
-	token.ASTER: PRODUCT,
-	token.LT:    LESSGREATER,
-	token.GT:    LESSGREATER,
-	token.EQ:    EQUALS,
-	token.NEQ:   EQUALS,
-}
-
-func (p *Parser) peekPrecidence() precidence {
-	if p, ok := precidenceMap[p.peekTok.Type]; ok {
+func (p *Parser) peekPrecidence() internal.Precidence {
+	if p, ok := internal.PrecidenceMap[p.peekTok.Type]; ok {
 		return p
 	}
-	return LOWEST
+	return internal.LOWEST
 }
 
-func (p *Parser) currPrecidence() precidence {
-	if p, ok := precidenceMap[p.currTok.Type]; ok {
+func (p *Parser) currPrecidence() internal.Precidence {
+	if p, ok := internal.PrecidenceMap[p.currTok.Type]; ok {
 		return p
 	}
-	return LOWEST
+	return internal.LOWEST
 }

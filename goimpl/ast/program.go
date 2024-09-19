@@ -18,12 +18,13 @@ func (p *Program) TokenLiteral() string {
 }
 
 func (p *Program) String() string {
-	out := "---- Program Start ----\n"
+	out := "\n---- Program Start ----\n"
 	for _, s := range p.Statements {
+		out += "\n"
 		out += s.String()
 		out += "\n"
 	}
-	out += "---- Program End ----\n"
+	out += "\n---- Program End ----\n"
 	return out
 }
 

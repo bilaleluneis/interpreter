@@ -19,12 +19,12 @@ func TestReturnStatment(t *testing.T) {
 	})
 
 	p := New(&l)
-	program := p.ParseProgram()
+	_, ok := p.ParseProgram()
 	if len(p.Errors()) > 0 {
 		printErrs(p)
 		t.FailNow()
 	}
-	if program == nil {
-		t.Fatalf("ParseProgram() returned nil")
+	if !ok {
+		t.Fatalf("ParseProgram() failed")
 	}
 }

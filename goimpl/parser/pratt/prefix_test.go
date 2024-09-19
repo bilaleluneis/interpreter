@@ -37,7 +37,7 @@ func TestPrefix(t *testing.T) {
 		expectedValue := tt.expectedValue
 		lexr := tt.lexr
 		p := New(&lexr)
-		program := p.ParseProgram()
+		program, _ := p.ParseProgram()
 		if len(p.Errors()) > 0 {
 			printErrs(p)
 			t.FailNow()

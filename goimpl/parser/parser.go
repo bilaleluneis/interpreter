@@ -3,7 +3,7 @@ package parser
 import "goimpl/ast"
 
 type ParserType interface {
-	ParseProgram() *ast.Program
+	ParseProgram() (ast.Program, bool)
 }
 
 type PrefixParseFn func(ParserType) ast.Expression

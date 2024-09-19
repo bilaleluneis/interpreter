@@ -37,26 +37,23 @@ type Parser[L any, CL lexer.CopyableLexer[L]] struct {
 	parsers   []ParserFunc[L, CL]
 }
 
-func (p Parser[L, CL]) ParseProgram() *ast.Program {
+func (p Parser[L, CL]) ParseProgram() (ast.Program, bool) {
 	var parsedStatements []ast.Statement
 	lxr := p.currLexer
 	parseNext := true
 	isError := func(stmnt ast.Statement) bool { _, isError := stmnt.(ast.Error); return isError }
 	for parseNext {
-		// if we have reached EOF then stop parsing
-		if p.isEof(lxr) {
-			parseNext = false
+		parseNext = false // we default to not parsting again, unless we have more to parse
+		if p.isEof(lxr) { // if we have reached EOF then skip rest of loop
 			continue
 		}
 		if result, ok := p.parse(lxr).drop(isError).first(); ok {
 			lxr = result.lxr //update to use lexer associated success parsing, that could have advanced
 			parsedStatements = append(parsedStatements, result.stmnt)
-		} else {
-			parseNext = false
-			parsedStatements = append(parsedStatements, ast.Error{Message: "No valid statement parsed"})
+			parseNext = true // we might have more to parse, attempt again
 		}
 	}
-	return &ast.Program{Statements: parsedStatements}
+	return ast.Program{Statements: parsedStatements}, len(parsedStatements) > 0
 }
 
 func (p Parser[L, CL]) parse(currLxr L) resultList[L, CL] {

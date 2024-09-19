@@ -49,20 +49,7 @@ func TestFailParse(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	result := New(l, Fail[lexer.StubLexer]).ParseProgram()
-
-	// check that we got one statment
-	if len(result.Statements) != 1 {
-		t.Fatalf("expected 1 statement got %d", len(result.Statements))
-	}
-
-	// check that the statement is an error
-	if _, ok := result.Statements[0].(ast.Error); !ok {
-		t.Fatalf("expected error statement got %T", result.Statements[0])
-	}
-
-	// check that the error message is correct
-	if result.Statements[0].TokenLiteral() != "No valid statement parsed" {
-		t.Fatalf("expected [No valid statement parsed] got %s", result.Statements[0].TokenLiteral())
+	if _, ok := New(l, Fail[lexer.StubLexer]).ParseProgram(); ok {
+		t.Fatalf("expected !ok program got ok")
 	}
 }

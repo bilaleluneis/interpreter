@@ -1,13 +1,13 @@
-package pratt
+package test
 
 import (
 	"goimpl/lexer"
+	"goimpl/parser/combinator"
 	"goimpl/token"
 	"testing"
 )
 
 func TestParseLetStatement(t *testing.T) {
-
 	// let x = 5;
 	l := lexer.NewStubLexer([]token.Token{
 		{Type: token.LET, Literal: "let"},
@@ -18,14 +18,13 @@ func TestParseLetStatement(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	p := New(&l)
-	program := p.ParseProgram()
-	if len(p.Errors()) > 0 {
-		printErrs(p)
-		t.FailNow()
-	}
-	if program == nil {
-		t.Fatalf("ParseProgram() returned nil")
+	for pname, parser := range testParsers(l).initPratt().initCombinator(combinator.Let).parsers {
+		program, ok := parser.ParseProgram()
+		if !ok {
+			t.Errorf("\nexpected ok program for parser %s, got: !ok", pname)
+		} else {
+			t.Logf("\npass--parser %s, got: %s", pname, program)
+		}
 	}
 }
 
@@ -39,10 +38,9 @@ func TestParseLetStatementError(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	p := New(&l)
-	_ = p.ParseProgram()
-	if len(p.Errors()) == 0 {
-		t.Fatalf("expected error")
+	for pname, parser := range testParsers(l).initPratt().initCombinator(combinator.Let).parsers {
+		if program, ok := parser.ParseProgram(); ok {
+			t.Errorf("\nexpected !ok program for parser %s, got: %s", pname, program)
+		}
 	}
-	printErrs(p)
 }

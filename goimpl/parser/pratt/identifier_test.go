@@ -17,7 +17,7 @@ func TestIdentifierExpression(t *testing.T) {
 	l := lexer.NewStubLexer(tokens)
 
 	p := New(&l)
-	program := p.ParseProgram()
+	program, _ := p.ParseProgram()
 	printErrs(p)
 	if len(program.Statements) != 1 {
 		t.Fatalf("program.Statements does not contain 1 statements. got=%d", len(program.Statements))

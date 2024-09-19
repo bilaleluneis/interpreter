@@ -42,14 +42,14 @@ func (p *Parser) Errors() []string {
 	return p.errors
 }
 
-func (p *Parser) ParseProgram() *ast.Program {
-	program := &ast.Program{Statements: []ast.Statement{}}
-	for p.currTok.Type != token.EOF {
-		stmt := p.parseStatement()
-		if stmt != nil {
-			program.Statements = append(program.Statements, stmt)
-		}
+func (p *Parser) ParseProgram() (ast.Program, bool) {
+	program := ast.Program{Statements: []ast.Statement{}}
+	for stmt := p.parseStatement(); len(p.errors) == 0; stmt = p.parseStatement() {
+		program.Statements = append(program.Statements, stmt)
 		p.nextToken()
+		if p.peekTok.Type == token.EOF {
+			break
+		}
 	}
-	return program
+	return program, len(p.errors) == 0
 }

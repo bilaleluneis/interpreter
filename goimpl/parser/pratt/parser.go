@@ -43,13 +43,13 @@ func (p *Parser) Errors() []string {
 }
 
 func (p *Parser) ParseProgram() (ast.Program, bool) {
-	program := ast.Program{Statements: []ast.Statement{}}
+	var parsedStatements []ast.Statement
 	for stmt := p.parseStatement(); len(p.errors) == 0; stmt = p.parseStatement() {
-		program.Statements = append(program.Statements, stmt)
+		parsedStatements = append(parsedStatements, stmt)
 		p.nextToken()
 		if p.peekTok.Type == token.EOF {
 			break
 		}
 	}
-	return program, len(p.errors) == 0
+	return ast.Program{Statements: parsedStatements}, len(p.errors) == 0
 }

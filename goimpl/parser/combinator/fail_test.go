@@ -39,6 +39,9 @@ func TestFailFunc(t *testing.T) {
 	}
 }
 
+// TestFailParse tests the Fail parser function
+// when invoked by the parser, this is function
+// is unique to the combinator package
 func TestFailParse(t *testing.T) {
 	l := lexer.NewStubLexer([]token.Token{
 		{Type: token.LET, Literal: "let"},

@@ -7,14 +7,14 @@ import (
 	"goimpl/parser/pratt"
 )
 
-type lxrTyp = lexer.StubLexer // alias for lexer.StubLexer
+type lxrT = lexer.StubLexer // alias type for lexer.StubLexer
 
 type parsersUnderTest struct {
-	lexer   lxrTyp
+	lexer   lxrT
 	parsers map[string]parser.ParserType
 }
 
-func testParsers(lxr lxrTyp) *parsersUnderTest {
+func testParsers(lxr lxrT) *parsersUnderTest {
 	return &parsersUnderTest{
 		lexer:   lxr,
 		parsers: make(map[string]parser.ParserType),
@@ -27,7 +27,7 @@ func (p *parsersUnderTest) initPratt() *parsersUnderTest {
 	return p
 }
 
-func (p *parsersUnderTest) initCombinator(parserF ...combinator.ParserFunc[lxrTyp, *lxrTyp]) *parsersUnderTest {
+func (p *parsersUnderTest) initCombinator(parserF ...combinator.ParserFunc[lxrT, *lxrT]) *parsersUnderTest {
 	p.parsers["combinator"] = combinator.New(p.lexer.GetCopy(), parserF...)
 	return p
 }

@@ -37,6 +37,11 @@ type Parser[L any, CL lexer.CopyableLexer[L]] struct {
 	parsers   []ParserFunc[L, CL]
 }
 
+// ParseProgram will always create a new deep copy of lexer
+// and then pass it to list of parsers, the result will be
+// collected and parse failures filtered out, the first
+// successful parse result will be appended to the parsed statments list
+// and lexer associated with that parse will be used to parse next
 func (p Parser[L, CL]) ParseProgram() (ast.Program, bool) {
 	var parsedStatements []ast.Statement
 	lxr := p.currLexer

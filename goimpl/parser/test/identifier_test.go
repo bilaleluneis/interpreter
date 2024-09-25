@@ -8,15 +8,16 @@ import (
 	"testing"
 )
 
-func TestIntLiteralExpr(t *testing.T) {
-	// 5;
-	l := lexer.NewStubLexer([]token.Token{
-		{Type: token.INT, Literal: "5"},
+func TestIdentifierExpression(t *testing.T) {
+	tokens := []token.Token{
+		{Type: token.IDENTIFIER, Literal: "foobar"},
 		{Type: token.SEMICOLON, Literal: ";"},
 		{Type: token.EOF, Literal: ""},
-	})
+	}
 
-	for pname, parser := range testParsers(l).initPratt().initCombinator(combinator.IntExpr).parsers {
+	l := lexer.NewStubLexer(tokens)
+
+	for pname, parser := range testParsers(l).initPratt().initCombinator(combinator.IdentifierExpr).parsers {
 		var program ast.Program
 		var literal string
 		var ok bool
@@ -24,10 +25,10 @@ func TestIntLiteralExpr(t *testing.T) {
 			t.Errorf("\nexpected ok program for parser %s, got: !ok", pname)
 		} else if !isExpressionStmt(program.Statements[0]) {
 			t.Errorf("\nexpected *ast.ExpressionStatement, got: %T", program.Statements[0])
-		} else if literal, ok = isIntLiteral(program.Statements[0]); !ok {
-			t.Errorf("\nexpected *ast.IntegerLiteral")
-		} else if literal != "5" {
-			t.Errorf("\nexpected token literal 5, got: %s", literal)
+		} else if literal, ok = isIdentifier(program.Statements[0]); !ok {
+			t.Errorf("\nexpected identifier expression")
+		} else if literal != "foobar" {
+			t.Errorf("\nexpected identifier 'foobar', got: %s", literal)
 		}
 	}
 }

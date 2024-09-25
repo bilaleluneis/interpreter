@@ -43,31 +43,3 @@ func TestLetFunc(t *testing.T) {
 	}
 	//TODO: might want to check the values of the let statement
 }
-
-func TestLetParse(t *testing.T) {
-	//let x = 5;
-	l := lexer.NewStubLexer([]token.Token{
-		{Type: token.LET, Literal: "let"},
-		{Type: token.IDENTIFIER, Literal: "x"},
-		{Type: token.ASSIGN, Literal: "="},
-		{Type: token.INT, Literal: "5"},
-		{Type: token.SEMICOLON, Literal: ";"},
-		{Type: token.EOF, Literal: ""},
-	})
-
-	result, ok := New(l, Let[lexer.StubLexer]).ParseProgram()
-
-	if !ok {
-		t.Fatalf("expected ok program got !ok")
-	}
-
-	// check that we got one statment
-	if len(result.Statements) != 1 {
-		t.Fatalf("expected 1 statement got %d", len(result.Statements))
-	}
-
-	// check that the statement is a let statement
-	if _, ok := result.Statements[0].(ast.Let); !ok {
-		t.Fatalf("expected let statement got %T", result.Statements[0])
-	}
-}

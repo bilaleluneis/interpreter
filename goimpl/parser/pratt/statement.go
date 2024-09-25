@@ -41,6 +41,7 @@ func (p *Parser) parseLetStatment() ast.Statement {
 	return stmt
 }
 
+// FIXME: at the moment value is not captured, just skipping until we find a semicolon
 func (p *Parser) parseReturnStatment() ast.Statement {
 	stmt := &ast.Return{Tok: p.currTok}
 	//FIXME: Implement the rest of the parsing logic, skipping expression at the moment

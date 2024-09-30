@@ -6,17 +6,17 @@ import (
 	"goimpl/token"
 )
 
-type Result[L any, CL lexer.CopyableLexer[L]] struct {
+type Result[L lexer.LexerConstraint[L]] struct {
 	lxr   L
 	stmnt ast.Statement
 }
 
-type ParserFunc[L any, CL lexer.CopyableLexer[L]] func(L) Result[L, CL]
+type ParserFunc[L lexer.LexerConstraint[L]] func(L) Result[L]
 
-type resultList[L any, CL lexer.CopyableLexer[L]] []Result[L, CL]
+type resultList[L lexer.Lexer] []Result[L]
 
-func (resList resultList[L, CL]) drop(f func(ast.Statement) bool) resultList[L, CL] {
-	var filteredList resultList[L, CL]
+func (resList resultList[L]) drop(f func(ast.Statement) bool) resultList[L] {
+	var filteredList resultList[L]
 	for _, result := range resList {
 		if !f(result.stmnt) {
 			filteredList = append(filteredList, result)
@@ -25,16 +25,16 @@ func (resList resultList[L, CL]) drop(f func(ast.Statement) bool) resultList[L, 
 	return filteredList
 }
 
-func (resList resultList[L, CL]) first() (Result[L, CL], bool) {
+func (resList resultList[L]) first() (Result[L], bool) {
 	if len(resList) == 0 {
-		return Result[L, CL]{}, false
+		return Result[L]{}, false
 	}
 	return resList[0], true
 }
 
-type Parser[L any, CL lexer.CopyableLexer[L]] struct {
+type Parser[L lexer.CopyableLexer[L]] struct {
 	currLexer L
-	parsers   []ParserFunc[L, CL]
+	parsers   []ParserFunc[L]
 }
 
 // ParseProgram will always create a new deep copy of lexer
@@ -42,7 +42,7 @@ type Parser[L any, CL lexer.CopyableLexer[L]] struct {
 // collected and parse failures filtered out, the first
 // successful parse result will be appended to the parsed statments list
 // and lexer associated with that parse will be used to parse next
-func (p Parser[L, CL]) ParseProgram() (ast.Program, bool) {
+func (p Parser[L]) ParseProgram() (ast.Program, bool) {
 	var parsedStatements []ast.Statement
 	lxr := p.currLexer
 	parseNext := true
@@ -61,21 +61,21 @@ func (p Parser[L, CL]) ParseProgram() (ast.Program, bool) {
 	return ast.Program{Statements: parsedStatements}, len(parsedStatements) > 0
 }
 
-func (p Parser[L, CL]) parse(currLxr L) resultList[L, CL] {
-	var resultList resultList[L, CL]
+func (p Parser[L]) parse(currLxr L) resultList[L] {
+	var resultList resultList[L]
 	for _, parser := range p.parsers {
-		lxr := CL(&currLxr).GetCopy() // make copy of lexer
+		lxr := currLxr.GetCopy()
 		result := parser(lxr)
 		resultList = append(resultList, result)
 	}
 	return resultList
 }
 
-func (p Parser[L, CL]) isEof(currLxr L) bool {
-	cp := CL(&currLxr).GetCopy()
-	return CL(&cp).NextToken().Type == token.EOF
+func (p Parser[L]) isEof(currLxr L) bool {
+	cp := currLxr.GetCopy()
+	return cp.NextToken().Type == token.EOF
 }
 
-func New[L any, CL lexer.CopyableLexer[L]](lexer L, parsers ...ParserFunc[L, CL]) Parser[L, CL] {
-	return Parser[L, CL]{currLexer: lexer, parsers: parsers}
+func New[L lexer.CopyableLexer[L]](lexer L, parsers ...ParserFunc[L]) Parser[L] {
+	return Parser[L]{currLexer: lexer, parsers: parsers}
 }

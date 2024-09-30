@@ -10,8 +10,11 @@ type Lexer interface {
 	NextToken() token.Token
 }
 
+type LexerConstraint[T any] interface {
+	Lexer
+}
+
 type CopyableLexer[T any] interface {
 	Lexer
 	common.VType[T]
-	*T
 }

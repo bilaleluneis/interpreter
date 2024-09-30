@@ -14,9 +14,9 @@ func (l *StubLexer) NextToken() token.Token {
 	return tok
 }
 
-func (l StubLexer) GetCopy() StubLexer {
-	copied := NewStubLexer(l)
-	return copied
+func (l *StubLexer) GetCopy() *StubLexer {
+	copied := NewStubLexer(*l)
+	return &copied
 }
 
 func NewStubLexer(toks []token.Token) StubLexer {

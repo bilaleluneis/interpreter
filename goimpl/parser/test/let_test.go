@@ -18,7 +18,7 @@ func TestParseLetStatement(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	for pname, parser := range testParsers(l).initPratt().initCombinator(combinator.Let).parsers {
+	for pname, parser := range testParsers(&l).initPratt().initCombinator(combinator.Let).parsers {
 		program, ok := parser.ParseProgram()
 		if !ok {
 			t.Errorf("\nexpected ok program for parser %s, got: !ok", pname)
@@ -38,7 +38,7 @@ func TestParseLetStatementError(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	for pname, parser := range testParsers(l).initPratt().initCombinator(combinator.Let).parsers {
+	for pname, parser := range testParsers(&l).initPratt().initCombinator(combinator.Let).parsers {
 		if program, ok := parser.ParseProgram(); ok {
 			t.Errorf("\nexpected !ok program for parser %s, got: %s", pname, program)
 		}

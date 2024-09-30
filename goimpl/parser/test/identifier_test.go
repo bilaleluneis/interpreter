@@ -17,7 +17,7 @@ func TestIdentifierExpression(t *testing.T) {
 
 	l := lexer.NewStubLexer(tokens)
 
-	for pname, parser := range testParsers(l).initPratt().initCombinator(combinator.IdentifierExpr).parsers {
+	for pname, parser := range testParsers(&l).initPratt().initCombinator(combinator.IdentifierExpr).parsers {
 		var program ast.Program
 		var literal string
 		var ok bool

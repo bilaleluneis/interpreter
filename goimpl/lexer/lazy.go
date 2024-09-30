@@ -13,12 +13,12 @@ func NewLazyLexer(input string) LazyLexer {
 	return LazyLexer{input: input}
 }
 
-func (l LazyLexer) GetCopy() LazyLexer {
+func (l *LazyLexer) GetCopy() *LazyLexer {
 	lcopy := LazyLexer{input: l.input}
 	lcopy.prevReadIndx = l.prevReadIndx
 	lcopy.nextReadIndex = l.nextReadIndex
 	lcopy.charUnderInspection = l.charUnderInspection
-	return lcopy
+	return &lcopy
 }
 
 // NextToken TODO: refactor to reduce if/else and manual advanceLoc()

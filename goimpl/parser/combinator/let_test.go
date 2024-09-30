@@ -20,10 +20,11 @@ func TestLetFunc(t *testing.T) {
 
 	// call the Let function and pass copy of lexer
 	// similar to what combinator.Parser.parse() does
-	result := Let(l.GetCopy())
+	lexerUnderTest := l.GetCopy()
+	result := Let(lexerUnderTest)
 
 	// check that the lexer we got back is not same instance as passed
-	if &l == &result.lxr {
+	if &l == result.lxr {
 		t.Fatalf("expected different lexer instance got same")
 	}
 

@@ -18,7 +18,7 @@ func TestReturnStatment(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	for pname, parser := range testParsers(l).initPratt().initCombinator(combinator.Retrn).parsers {
+	for pname, parser := range testParsers(&l).initPratt().initCombinator(combinator.Retrn).parsers {
 		fmt.Printf("invoking parser: %s\n", pname)
 		if program, ok := parser.ParseProgram(); !ok {
 			t.Errorf("\nexpected ok program for parser %s, got: !ok", pname)

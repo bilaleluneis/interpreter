@@ -16,7 +16,7 @@ func TestIntLiteralExpr(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	for pname, parser := range testParsers(l).initPratt().initCombinator(combinator.IntExpr).parsers {
+	for pname, parser := range testParsers(&l).initPratt().initCombinator(combinator.IntExpr).parsers {
 		var program ast.Program
 		var literal string
 		var ok bool

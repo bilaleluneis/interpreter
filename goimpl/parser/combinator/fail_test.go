@@ -21,10 +21,11 @@ func TestFailFunc(t *testing.T) {
 
 	// call the Fail function and pass copy of lexer
 	// similar to what combinator.Parser.parse() does
-	result := Fail(l.GetCopy())
+	lexerUnderTest := l.GetCopy()
+	result := Fail(lexerUnderTest)
 
 	// check that the lexer we got back is not same instance as passed
-	if &l == &result.lxr {
+	if &l == result.lxr {
 		t.Fatalf("expected different lexer instance got same")
 	}
 
@@ -52,7 +53,7 @@ func TestFailParse(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
-	if _, ok := New(l, Fail[lexer.StubLexer]).ParseProgram(); ok {
+	if _, ok := New(&l, Fail).ParseProgram(); ok {
 		t.Fatalf("expected !ok program got ok")
 	}
 }

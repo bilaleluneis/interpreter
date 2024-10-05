@@ -44,3 +44,14 @@ func isReturn(stmt ast.Statement) (ast.Expression, bool) {
 	}
 	return nil, false
 }
+
+func isPrefixExpression(stmt ast.Statement) (*ast.PrefixExpression, bool) {
+	if ptr, ok := stmt.(*ast.ExpressionStatement); ok {
+		prefix, isPrefix := ptr.Exprssn.(*ast.PrefixExpression)
+		return prefix, isPrefix
+	} else if value, ok := stmt.(ast.ExpressionStatement); ok {
+		prefix, isPrefix := value.Exprssn.(ast.PrefixExpression)
+		return &prefix, isPrefix
+	}
+	return nil, false
+}

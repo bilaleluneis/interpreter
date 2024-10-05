@@ -11,6 +11,11 @@ type Result[L lexer.LexerConstraint[L]] struct {
 	stmnt ast.Statement
 }
 
+func (r Result[L]) IsError() bool {
+	_, isError := r.stmnt.(ast.Error)
+	return isError
+}
+
 type ParserFunc[L lexer.LexerConstraint[L]] func(L) Result[L]
 
 type resultList[L lexer.Lexer] []Result[L]

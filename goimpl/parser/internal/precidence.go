@@ -2,6 +2,14 @@ package internal
 
 import "goimpl/token"
 
+type Operator string
+
+const (
+	_     Operator = ""
+	BANG  Operator = "!"
+	MINUS Operator = "-"
+)
+
 type Precidence int
 
 const (

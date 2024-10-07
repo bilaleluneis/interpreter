@@ -33,7 +33,7 @@ var prefixTests = []struct {
 
 func TestPrefixExpression(t *testing.T) {
 	for _, tt := range prefixTests {
-		for pname, parser := range testParsers(&tt.lexr).initPratt().initCombinator(combinator.ParsePrefixInt).parsers {
+		for pname, parser := range testParsers(&tt.lexr).initPratt().initCombinator(combinator.PrefixInt).parsers {
 			if program, ok := parser.ParseProgram(); !ok {
 				t.Errorf("\nexpected ok program for parser %s, got: !ok", pname)
 			} else if !isExpressionStmt(program.Statements[0]) {

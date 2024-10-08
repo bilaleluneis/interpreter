@@ -1,9 +1,6 @@
 package ast
 
-import (
-	"goimpl/debug/treedrawer/tree"
-	"goimpl/token"
-)
+import "goimpl/token"
 
 type Let struct {
 	Tok   token.Token // the token.LET token
@@ -21,10 +18,4 @@ func (l Let) String() string {
 		out += l.Value.String()
 	}
 	return out + ";"
-}
-
-func visualizeLet(l Let, parent *tree.Tree) {
-	let := parent.AddChild(tree.NodeString(l.Tok.Literal))
-	visualizeIdentifier(*l.Name, let)
-	visualizeExpression(l.Value, let)
 }

@@ -1,8 +1,6 @@
 package pratt
 
-import (
-	"goimpl/token"
-)
+import "goimpl/token"
 
 func (p *Parser) nextToken() {
 	p.currTok = p.peekTok

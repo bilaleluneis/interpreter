@@ -1,9 +1,6 @@
 package ast
 
-import (
-	"goimpl/debug/treedrawer/tree"
-	"goimpl/token"
-)
+import "goimpl/token"
 
 type Return struct {
 	Tok   token.Token // the token.RETURN token
@@ -20,9 +17,4 @@ func (r Return) String() string {
 		out += r.Value.String()
 	}
 	return out + ";"
-}
-
-func visualizeReturn(r Return, parent *tree.Tree) {
-	ret := parent.AddChild(tree.NodeString(r.Tok.Literal))
-	visualizeExpression(r.Value, ret)
 }

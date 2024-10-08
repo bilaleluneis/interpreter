@@ -1,9 +1,6 @@
 package ast
 
-import (
-	"goimpl/debug/treedrawer/tree"
-	"goimpl/token"
-)
+import "goimpl/token"
 
 // Identifier can also be an Expression
 type Identifier struct {
@@ -19,8 +16,4 @@ func (i Identifier) TokenLiteral() string {
 
 func (i Identifier) String() string {
 	return i.Value
-}
-
-func visualizeIdentifier(i Identifier, parent *tree.Tree) {
-	parent.AddChild(tree.NodeString(i.Value))
 }

@@ -1,8 +1,6 @@
 package common
 
-import (
-	"testing"
-)
+import "testing"
 
 // Testing the CopyOf function with Type that has only value reciever
 func TestValueReciever(t *testing.T) {

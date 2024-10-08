@@ -1,9 +1,6 @@
 package ast
 
-import (
-	"goimpl/debug/treedrawer/tree"
-	"goimpl/token"
-)
+import "goimpl/token"
 
 type ExpressionStatement struct {
 	Tok     token.Token // the first token of the Exprssn
@@ -21,24 +18,4 @@ func (e ExpressionStatement) String() string {
 		return e.Exprssn.String()
 	}
 	return ""
-}
-
-func visualizeExpressionStatement(exs ExpressionStatement, parent *tree.Tree) {
-	expression := exs.Exprssn
-	if expression != nil {
-		visualizeExpression(expression, parent)
-	}
-}
-
-func visualizeExpression(ex Expression, parent *tree.Tree) {
-	switch exprType := ex.(type) {
-	case *InfixExpression:
-		visualizeInfixExpression(*exprType, parent)
-	case *PrefixExpression:
-		visualizePrefixExpression(*exprType, parent)
-	case *IntegerLiteral:
-		visualizeIntegerLiteral(*exprType, parent)
-	case *Identifier:
-		visualizeIdentifier(*exprType, parent)
-	}
 }

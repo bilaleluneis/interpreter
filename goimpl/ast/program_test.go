@@ -20,7 +20,6 @@ func TestProgram(t *testing.T) {
 		t.Errorf("program.TokenLiteral not 'let'. got=%q", program.TokenLiteral())
 	}
 	fmt.Println(program)
-	program.Visualize()
 }
 
 // let myVar = 5;

@@ -3,7 +3,6 @@ package pratt
 import (
 	"goimpl/ast"
 	"goimpl/lexer"
-	"goimpl/parser"
 	"goimpl/token"
 )
 
@@ -12,16 +11,19 @@ type Parser struct {
 	currTok        token.Token
 	peekTok        token.Token
 	errors         []string
-	prefixParseFns map[token.TokenType]parser.PrefixParseFn
-	infixParseFns  map[token.TokenType]parser.InfixParseFn
+	prefixParseFns map[token.TokenType]PrefixParseFn
+	infixParseFns  map[token.TokenType]InfixParseFn
 }
+
+type PrefixParseFn func(*Parser) ast.Expression
+type InfixParseFn func(*Parser, ast.Expression) ast.Expression
 
 func New(l lexer.Lexer) *Parser {
 	p := &Parser{
 		lexer:          l,
 		errors:         []string{},
-		prefixParseFns: make(map[token.TokenType]parser.PrefixParseFn),
-		infixParseFns:  make(map[token.TokenType]parser.InfixParseFn),
+		prefixParseFns: make(map[token.TokenType]PrefixParseFn),
+		infixParseFns:  make(map[token.TokenType]InfixParseFn),
 	}
 
 	// Register prefix parse functions

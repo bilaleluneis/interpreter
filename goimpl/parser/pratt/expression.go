@@ -3,7 +3,6 @@ package pratt
 import (
 	"fmt"
 	"goimpl/ast"
-	"goimpl/parser"
 	"goimpl/parser/internal"
 	"goimpl/token"
 	"strconv"
@@ -27,44 +26,32 @@ func (p *Parser) parseExpression(precedence internal.Precidence) ast.Expression 
 	return leftExpr
 }
 
-var parseInfixExpr parser.InfixParseFn = func(parser parser.ParserType, left ast.Expression) ast.Expression {
-	if prttParser, ok := parser.(*Parser); ok {
-		expr := &ast.InfixExpression{Tok: prttParser.currTok, Operator: prttParser.currTok.Literal, Left: left}
-		precedence := prttParser.currPrecidence()
-		prttParser.nextToken()
-		expr.Right = prttParser.parseExpression(precedence)
-		return expr
-	}
-	return nil
+var parseInfixExpr InfixParseFn = func(parser *Parser, left ast.Expression) ast.Expression {
+	expr := &ast.InfixExpression{Tok: parser.currTok, Operator: parser.currTok.Literal, Left: left}
+	precedence := parser.currPrecidence()
+	parser.nextToken()
+	expr.Right = parser.parseExpression(precedence)
+	return expr
 }
 
-var parseIdentifierExpr parser.PrefixParseFn = func(parser parser.ParserType) ast.Expression {
-	if prttParser, ok := parser.(*Parser); ok {
-		return &ast.Identifier{Tok: prttParser.currTok, Value: prttParser.currTok.Literal}
-	}
-	return nil
+var parseIdentifierExpr PrefixParseFn = func(parser *Parser) ast.Expression {
+	return &ast.Identifier{Tok: parser.currTok, Value: parser.currTok.Literal}
 }
 
-var parsePrefixExpr parser.PrefixParseFn = func(parser parser.ParserType) ast.Expression {
-	if prttParser, ok := parser.(*Parser); ok {
-		expr := &ast.PrefixExpression{Tok: prttParser.currTok, Operator: prttParser.currTok.Literal} //operator ex: ! or -
-		prttParser.nextToken()
-		expr.Right = prttParser.parseExpression(internal.PREFIX) //parse the right side of the operator
-		return expr
-	}
-	return nil
+var parsePrefixExpr PrefixParseFn = func(parser *Parser) ast.Expression {
+	expr := &ast.PrefixExpression{Tok: parser.currTok, Operator: parser.currTok.Literal} //operator ex: ! or -
+	parser.nextToken()
+	expr.Right = parser.parseExpression(internal.PREFIX) //parse the right side of the operator
+	return expr
 }
 
-var parseIntegerLiteral parser.PrefixParseFn = func(parser parser.ParserType) ast.Expression {
-	if prttParser, ok := parser.(*Parser); ok {
-		literal := &ast.IntegerLiteral{Tok: prttParser.currTok}
-		if value, err := strconv.ParseInt(prttParser.currTok.Literal, 0, 64); err == nil {
-			literal.Value = value
-			return literal
-		}
-		err := "could not parse " + prttParser.currTok.Literal + " as integer"
-		prttParser.errors = append(prttParser.errors, err)
-		return nil
+var parseIntegerLiteral PrefixParseFn = func(parser *Parser) ast.Expression {
+	literal := &ast.IntegerLiteral{Tok: parser.currTok}
+	if value, err := strconv.ParseInt(parser.currTok.Literal, 0, 64); err == nil {
+		literal.Value = value
+		return literal
 	}
-	return nil //FIXME: add error
+	err := "could not parse " + parser.currTok.Literal + " as integer"
+	parser.errors = append(parser.errors, err)
+	return nil
 }

@@ -22,3 +22,8 @@ func (p *Program) String() string {
 	out += "\n---- Program End ----\n"
 	return out
 }
+
+// top will return the last statement from the program, wont remove it
+func (p Program) top() string {
+	return p.Statements[len(p.Statements)-1].String()
+}

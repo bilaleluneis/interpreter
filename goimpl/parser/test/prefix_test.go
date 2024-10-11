@@ -35,18 +35,20 @@ func TestPrefixExpression(t *testing.T) {
 	for _, tt := range prefixTests {
 		for pname, parser := range testParsers(&tt.lexr).initPratt().initCombinator(combinator.PrefixInt).parsers {
 			if program, ok := parser.ParseProgram(); !ok {
-				t.Errorf("\nexpected ok program for parser %s, got: !ok", pname)
-			} else if !isExpressionStmt(program.Statements[0]) {
-				t.Errorf("\nexpected *ast.ExpressionStatement, got: %T", program.Statements[0])
-			} else if prefix, ok := isPrefixExpression(program.Statements[0]); !ok {
-				t.Errorf("\nexpected *ast.PrefixExpression")
+				fail(pname, t, "expected ok program got !ok")
+			} else if expr := toExpression(program.Statements[0]); expr == nil {
+				fail(pname, t, "expected expression got nil")
+			} else if prefix := toPrefixExpression(expr); prefix == nil {
+				fail(pname, t, "expected ast.PrefixExpression")
 			} else if prefix.Operator != tt.expectedOperator {
-				t.Errorf("\nexpected operator %s, got: %s", tt.expectedOperator, prefix.Operator)
-			} //else if literal, ok := isIntLiteral(prefix.Right); !ok {
-			// 	t.Errorf("\nexpected *ast.IntegerLiteral")
-			// } else if literal != tt.expectedValue {
-			// 	t.Errorf("\nexpected token literal %d, got: %d", tt.expectedValue, literal)
-			// }
+				fail(pname, t, "expected operator %s, got: %s", tt.expectedOperator, prefix.Operator)
+			} else if literal := toIntegerLiteral(prefix.Right); literal == nil {
+				fail(pname, t, "expected right side of expression to be and integer literal")
+			} else if literal.Value != tt.expectedValue {
+				fail(pname, t, "expected value %d, got: %d", tt.expectedValue, literal.Value)
+			} else {
+				success(pname, t, "parser %s passed with result %s", pname, program)
+			}
 		}
 	}
 }

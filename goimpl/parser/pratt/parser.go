@@ -31,6 +31,8 @@ func New(l lexer.Lexer) *Parser {
 	p.registerPrefix(token.INT, parseIntegerLiteral)
 	p.registerPrefix(token.BANG, parsePrefixExpr)
 	p.registerPrefix(token.MINUS, parsePrefixExpr)
+	p.registerPrefix(token.TRUE, parseBooleanExpr)
+	p.registerPrefix(token.FALSE, parseBooleanExpr)
 
 	// Register infix parse functions
 	p.registerInfix(token.PLUS, parseInfixExpr)

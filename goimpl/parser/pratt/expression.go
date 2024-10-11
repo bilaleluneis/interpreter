@@ -55,3 +55,7 @@ var parseIntegerLiteral PrefixParseFn = func(parser *Parser) ast.Expression {
 	parser.errors = append(parser.errors, err)
 	return nil
 }
+
+var parseBooleanExpr PrefixParseFn = func(parser *Parser) ast.Expression {
+	return &ast.Boolean{Tok: parser.currTok, Value: parser.currTok.Type == token.TRUE}
+}

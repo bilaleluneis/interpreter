@@ -21,9 +21,11 @@ func TestReturnStatment(t *testing.T) {
 	for pname, parser := range testParsers(&l).initPratt().initCombinator(combinator.Retrn).parsers {
 		fmt.Printf("invoking parser: %s\n", pname)
 		if program, ok := parser.ParseProgram(); !ok {
-			t.Errorf("\nexpected ok program for parser %s, got: !ok", pname)
-		} else if _, ok = isReturn(program.Statements[0]); !ok {
-			t.Errorf("\nexpected ast.Return")
+			fail(pname, t, "got not ok program")
+		} else if toReturn(program.Statements[0]) == nil {
+			fail(pname, t, "expected return statement")
+		} else {
+			success(pname, t, "parser %s passed with result %s", pname, program)
 		}
 	}
 }

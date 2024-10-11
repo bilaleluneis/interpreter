@@ -42,6 +42,8 @@ func TestInfixExpression(t *testing.T) {
 				fail(pname, t, "\nexpected *ast.IntegerLiteral")
 			} else if right.TokenLiteral() != tt.expectedRight {
 				fail(pname, t, "\nexpected token literal %s, got: %s", tt.expectedRight, right.TokenLiteral())
+			} else {
+				success(pname, t, "parser %s passed with result %s", pname, program)
 			}
 		}
 	}

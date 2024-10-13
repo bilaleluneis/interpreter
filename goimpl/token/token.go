@@ -5,6 +5,19 @@ type Token struct {
 	Literal string
 }
 
+func (t Token) isOneOf(types ...TokenType) bool {
+	for _, typ := range types {
+		if t.Type == typ {
+			return true
+		}
+	}
+	return false
+}
+
+func (t Token) String() string {
+	return t.Literal
+}
+
 func NewToken(tokenType TokenType, ch byte) Token {
 	return Token{tokenType, string(ch)}
 }

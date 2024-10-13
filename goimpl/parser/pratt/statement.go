@@ -24,6 +24,7 @@ func (p *Parser) parseLetStatment() ast.Statement {
 		p.errors = append(p.errors, fmt.Sprintf("expected IDENTIFIER, got %s", p.peekTok.Type))
 		return nil
 	}
+
 	p.nextToken()
 	stmt.Name = &ast.Identifier{Tok: p.currTok, Value: p.currTok.Literal}
 	if p.peekTok.Type != token.ASSIGN {
@@ -31,9 +32,14 @@ func (p *Parser) parseLetStatment() ast.Statement {
 		return nil
 	}
 
-	//FIXME: Implement the rest of the parsing logic
-	//for now just skip until we encounter a semicolon
-	//ignoring what comes after the equal sign
+	p.nextToken() // consume the ASSIGN token
+	p.nextToken() // consume the value token (expression)
+	if expr := p.parseExpression(internal.LOWEST); expr != nil {
+		stmt.Value = expr
+	} else {
+		return nil
+	}
+
 	for p.currTok.Type != token.SEMICOLON {
 		p.nextToken()
 	}
@@ -51,8 +57,7 @@ func (p *Parser) parseReturnStatment() ast.Statement {
 }
 
 func (p *Parser) invalidStatment() ast.Statement {
-	p.errors = append(p.errors, fmt.Sprintf("invalid token %s", p.currTok.Type))
-	return nil
+	return ast.Error{Message: fmt.Sprintf("invalid token %s", p.currTok.Type)}
 }
 
 func (p *Parser) parseExpressionStatement() ast.Statement {

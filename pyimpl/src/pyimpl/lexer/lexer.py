@@ -9,7 +9,7 @@ class Lexer:
         self.__input: str = input_str
         self.__prev_read_index: int = 0
         self.__next_read_index: int = 0
-        self.__char_under_inspection: bytes = b''
+        self.__char_under_inspection: bytes = b""
 
     def next_token(self) -> Token:
         """Returns the next token in the input string."""
@@ -44,9 +44,11 @@ class Lexer:
 
     def __read_char(self) -> None:
         if self.__next_read_index >= len(self.__input):
-            self.__char_under_inspection = b''
+            self.__char_under_inspection = b""
         else:
-            self.__char_under_inspection = self.__input[self.__next_read_index].encode("utf-8")
+            self.__char_under_inspection = self.__input[self.__next_read_index].encode(
+                "utf-8"
+            )
         self.__prev_read_index = self.__next_read_index
         self.__next_read_index += 1
 
@@ -74,7 +76,7 @@ class Lexer:
     @property
     def str_under_inspection(self) -> str:
         """Returns the string representation of the character under inspection."""
-        if self.__char_under_inspection == b'':
+        if self.__char_under_inspection == b"":
             return ""
         return self.__char_under_inspection.decode("utf-8")
 

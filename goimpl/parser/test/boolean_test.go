@@ -16,6 +16,19 @@ var booleanTests = []struct {
 		{Type: token.SEMICOLON, Literal: ";"},
 		{Type: token.EOF, Literal: ""},
 	})},
+	{"false;", false, lexer.NewStubLexer([]token.Token{
+		{Type: token.FALSE, Literal: "false"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.EOF, Literal: ""},
+	})},
+	{"let f = true;", true, lexer.NewStubLexer([]token.Token{
+		{Type: token.LET, Literal: "let"},
+		{Type: token.IDENTIFIER, Literal: "f"},
+		{Type: token.ASSIGN, Literal: "="},
+		{Type: token.TRUE, Literal: "true"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.EOF, Literal: ""},
+	})},
 }
 
 // FIXME: combinator parser not used in this test

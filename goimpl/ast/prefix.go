@@ -16,3 +16,18 @@ func (pe PrefixExpression) TokenLiteral() string { return pe.Tok.Literal }
 func (pe PrefixExpression) String() string {
 	return "(" + pe.Operator + pe.Right.String() + ")"
 }
+
+func (pe PrefixExpression) Dump() string {
+	out := `ast.PrefixExpression{
+	Tok: ` + pe.Tok.Literal + `,
+	Operator: ` + pe.Operator + `,
+	Right: `
+	if pe.Right != nil {
+		out += pe.Right.Dump()
+	} else {
+		out += "nil"
+	}
+	out += `
+}`
+	return out
+}

@@ -30,7 +30,7 @@ func TestPrefixExpressionAst(t *testing.T) {
 
 	for _, tt := range tests {
 		program := &Program{Statements: []Statement{&ExpressionStatement{Exprssn: &tt.input}}}
-		actual := program.top()
+		actual := program.Top()
 		expected := tt.expected
 		if actual != expected {
 			t.Errorf("expected %q, got %q", expected, actual)

@@ -23,7 +23,19 @@ func (p *Program) String() string {
 	return out
 }
 
-// top will return the last statement from the program, wont remove it
-func (p Program) top() string {
+// Top will return the last statement from the program, wont remove it
+func (p Program) Top() string {
 	return p.Statements[len(p.Statements)-1].String()
+}
+
+func (p Program) Dump() string {
+	out := `ast.Program{
+	Statements: []ast.Statement{`
+	for _, s := range p.Statements {
+		out += s.Dump()
+		out += ",\n"
+	}
+	out += `	}
+}`
+	return out
 }

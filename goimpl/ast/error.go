@@ -7,3 +7,4 @@ type Error struct {
 func (Error) statmentNode()          {}
 func (e Error) TokenLiteral() string { return e.Message }
 func (e Error) String() string       { return e.Message }
+func (e Error) Dump() string         { return "ast.Error{" + e.Message + "}" }

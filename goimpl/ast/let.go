@@ -19,3 +19,11 @@ func (l Let) String() string {
 	}
 	return out + ";"
 }
+
+func (l Let) Dump() string {
+	return `ast.Let{
+	Tok: ` + l.Tok.Literal + `,
+	Name: ` + l.Name.Dump() + `,
+	Value: ` + l.Value.Dump() + `
+}`
+}

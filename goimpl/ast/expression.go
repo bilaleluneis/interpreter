@@ -19,3 +19,17 @@ func (e ExpressionStatement) String() string {
 	}
 	return ""
 }
+
+func (e ExpressionStatement) Dump() string {
+	out := `ast.ExpressionStatement{
+	Tok: ` + e.Tok.Literal + `,
+	Exprssn: `
+	if e.Exprssn != nil {
+		out += e.Exprssn.Dump()
+	} else {
+		out += "nil"
+	}
+	out += `
+}`
+	return out
+}

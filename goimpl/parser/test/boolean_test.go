@@ -1,49 +1,34 @@
 package test
 
 import (
+	"goimpl/ast"
 	"goimpl/lexer"
 	"goimpl/token"
 	"testing"
 )
 
-var booleanTests = []struct {
-	input    string
-	expected bool
-	lexer    lexer.StubLexer
-}{
-	{"true;", true, lexer.NewStubLexer([]token.Token{
-		{Type: token.TRUE, Literal: "true"},
-		{Type: token.SEMICOLON, Literal: ";"},
-		{Type: token.EOF, Literal: ""},
-	})},
-	{"false;", false, lexer.NewStubLexer([]token.Token{
-		{Type: token.FALSE, Literal: "false"},
-		{Type: token.SEMICOLON, Literal: ";"},
-		{Type: token.EOF, Literal: ""},
-	})},
-	{"let f = true;", true, lexer.NewStubLexer([]token.Token{
-		{Type: token.LET, Literal: "let"},
-		{Type: token.IDENTIFIER, Literal: "f"},
-		{Type: token.ASSIGN, Literal: "="},
-		{Type: token.TRUE, Literal: "true"},
-		{Type: token.SEMICOLON, Literal: ";"},
-		{Type: token.EOF, Literal: ""},
-	})},
+var booleanTests = []lexerToAstResult{
+	{
+		lxr: lexer.NewStubLexer([]token.Token{
+			{Type: token.TRUE, Literal: "true"},
+			{Type: token.SEMICOLON, Literal: ";"},
+			{Type: token.EOF, Literal: ""},
+		}),
+		expectedAst: &ast.ExpressionStatement{
+			Tok:     token.Token{Type: token.TRUE, Literal: "true"},
+			Exprssn: &ast.Boolean{Tok: token.Token{Type: token.TRUE, Literal: "true"}, Value: true},
+		},
+		expectedProgram: "true",
+	},
 }
 
 // FIXME: combinator parser not used in this test
 func TestBooleanExpression(t *testing.T) {
 	for _, tt := range booleanTests {
-		for pname, parser := range testParsers(&tt.lexer).initPratt().parsers {
-			if program, ok := parser.ParseProgram(); !ok {
-				fail(pname, t, "expected ok program got !ok")
-			} else if expr := toExpression(program.Statements[0]); expr == nil {
-				fail(pname, t, "expected expression")
-			} else if boolean := toBoolean(expr); boolean == nil {
-				fail(pname, t, "expected boolean expression")
-			} else {
-				success(pname, t, "parser %s passed with result %s", pname, program)
-			}
+		lxrUnderTest := &tt.lxr
+		for pname, parser := range testParsers(lxrUnderTest).initPratt().parsers {
+			t.Logf("testing parser %s", pname)
+			tt.test(t, parser)
 		}
 	}
 }

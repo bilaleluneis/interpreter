@@ -17,3 +17,10 @@ func (i Identifier) TokenLiteral() string {
 func (i Identifier) String() string {
 	return i.Value
 }
+
+func (i Identifier) Dump() string {
+	return `ast.Identifier{
+	Tok: ` + i.Tok.Literal + `,
+	Value: ` + i.Value + `
+}`
+}

@@ -16,3 +16,15 @@ func (b Block) String() string {
 	}
 	return out + "}"
 }
+
+func (b Block) Dump() string {
+	out := `ast.Block{
+	Tok: ` + b.Token.Literal + `,
+	Statements: []ast.Statement{`
+	for _, s := range b.Statements {
+		out += s.Dump() + ","
+	}
+	out += `}
+}`
+	return out
+}

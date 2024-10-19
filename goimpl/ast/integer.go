@@ -14,8 +14,5 @@ func (il IntegerLiteral) TokenLiteral() string { return il.Tok.Literal }
 func (il IntegerLiteral) String() string { return il.Tok.Literal }
 
 func (il IntegerLiteral) Dump() string {
-	return `ast.IntegerLiteral{
-	Tok: ` + il.Tok.Literal + `,
-	Value: ` + il.Tok.Literal + `
-}`
+	return `ast.IntegerLiteral{Tok: ` + il.Tok.Literal + `,Value: ` + il.Tok.Literal + `}`
 }

@@ -21,7 +21,7 @@ func (r Return) String() string {
 
 func (r Return) Dump() string {
 	return `ast.Return{
-	Tok: token.Token{ Type: token.RETURN, Literal: ` + r.Tok.Literal + `,
-    Value: ` + r.Value.Dump() + `
-}`
+	Tok: token.Token{ Type: token.RETURN, Literal: return}, 
+	Value: ` + r.Value.Dump() + `,
+	}`
 }

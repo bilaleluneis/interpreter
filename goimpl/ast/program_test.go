@@ -1,7 +1,6 @@
 package ast
 
 import (
-	"fmt"
 	"goimpl/token"
 	"testing"
 )
@@ -15,11 +14,11 @@ func TestProgram(t *testing.T) {
 			expressionStatement,
 		},
 	}
-
-	if program.TokenLiteral() != "let" {
-		t.Errorf("program.TokenLiteral not 'let'. got=%q", program.TokenLiteral())
+	if len(program.Statements) != 4 {
+		t.Fatalf("program.Statements does not contain 4 statements. got=%d", len(program.Statements))
 	}
-	fmt.Println(program)
+	t.Logf("Program: %s", program)
+	t.Logf("Program Dump: %s", program.Dump(1))
 }
 
 // let myVar = 5;

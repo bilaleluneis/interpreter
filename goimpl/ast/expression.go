@@ -1,6 +1,9 @@
 package ast
 
-import "goimpl/token"
+import (
+	"goimpl/token"
+	"strings"
+)
 
 type ExpressionStatement struct {
 	Tok     token.Token // the first token of the Exprssn
@@ -20,16 +23,17 @@ func (e ExpressionStatement) String() string {
 	return ""
 }
 
-func (e ExpressionStatement) Dump() string {
-	out := `ast.ExpressionStatement{
-	Tok: ` + e.Tok.Literal + `,
-	Exprssn: `
-	if e.Exprssn != nil {
-		out += e.Exprssn.Dump()
-	} else {
-		out += "nil"
-	}
-	out += `
-}`
+func (e ExpressionStatement) Dump(ident int) string {
+	out := "ast.ExpressionStatement{ //start of ExpressionStatment\n"
+	indentation := strings.Repeat("\t", ident)
+	out += indentation + "Tok: token.Token{ Type: " + e.Tok.String()
+	out += ", Literal: " + e.Tok.Literal + "},\n"
+	out += indentation + "Exprssn: " + func() string {
+		if e.Exprssn != nil {
+			return e.Exprssn.Dump(ident + 1)
+		}
+		return "nil"
+	}() + "\n"
+	out += strings.Repeat("\t", ident-1) + "} //end of ExpressionStatment"
 	return out
 }

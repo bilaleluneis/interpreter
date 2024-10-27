@@ -1,6 +1,9 @@
 package ast
 
-import "goimpl/token"
+import (
+	"goimpl/token"
+	"strings"
+)
 
 type Block struct {
 	token.Token // { token.LBRACE
@@ -17,14 +20,16 @@ func (b Block) String() string {
 	return out + "}"
 }
 
-func (b Block) Dump() string {
-	out := `ast.Block{
-	Tok: ` + b.Token.Literal + `,
-	Statements: []ast.Statement{`
+func (b Block) Dump(ident int) string {
+	identation := strings.Repeat("\t", ident)
+	out := identation + "ast.Block{ //start of Block\n"
+	out += identation + "\tToken: token.Token{ Type: token.LBRACE, Literal: " + b.Token.Literal + "},\n"
+	out += identation + "\tStatements: []ast.Statement{\n"
 	for _, s := range b.Statements {
-		out += s.Dump() + ","
+		out += s.Dump(ident + 1)
+		out += ",\n"
 	}
-	out += `}
-}`
+	out += identation + "}\n"
+	out += identation + "} //end of Block"
 	return out
 }

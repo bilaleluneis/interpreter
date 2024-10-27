@@ -1,6 +1,9 @@
 package ast
 
-import "goimpl/token"
+import (
+	"goimpl/token"
+	"strings"
+)
 
 type Return struct {
 	Tok   token.Token // the token.RETURN token
@@ -19,9 +22,17 @@ func (r Return) String() string {
 	return out + ";"
 }
 
-func (r Return) Dump() string {
-	return `ast.Return{
-	Tok: token.Token{ Type: token.RETURN, Literal: return}, 
-	Value: ` + r.Value.Dump() + `,
-	}`
+func (r Return) Dump(ident int) string {
+	out := strings.Repeat(" ", ident) + "ast.Return{ //start of Return\n"
+	out += strings.Repeat(" ", ident+1)
+	out += "Tok: token.Token{ Type: token.RETURN, Literal: \""
+	out += r.Tok.Literal + "\" },\n"
+	out += strings.Repeat(" ", ident+1) + "Value: "
+	if r.Value != nil {
+		out += r.Value.Dump(ident + 1)
+	} else {
+		out += "nil"
+	}
+	out += "\n" + strings.Repeat(" ", ident) + "} //end of Return"
+	return out
 }

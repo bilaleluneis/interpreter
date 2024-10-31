@@ -1,6 +1,7 @@
 package test
 
 import (
+	"goimpl/ast"
 	"goimpl/lexer"
 	"goimpl/parser/combinator"
 	"goimpl/token"
@@ -8,25 +9,31 @@ import (
 )
 
 func TestIdentifierExpression(t *testing.T) {
-	tokens := []token.Token{
+	var lxr = lexer.NewStubLexer([]token.Token{
 		{Type: token.IDENTIFIER, Literal: "foobar"},
 		{Type: token.SEMICOLON, Literal: ";"},
 		{Type: token.EOF, Literal: ""},
+	})
+
+	var expectedAst = &ast.ExpressionStatement{
+		Tok:     token.Token{Type: token.IDENTIFIER, Literal: "foobar"},
+		Exprssn: &ast.Identifier{Tok: token.Token{Type: token.IDENTIFIER, Literal: "foobar"}, Value: "foobar"},
 	}
 
-	l := lexer.NewStubLexer(tokens)
-
-	for pname, parser := range testParsers(&l).initPratt().initCombinator(combinator.IdentifierExpr).parsers {
-		if program, ok := parser.ParseProgram(); !ok {
-			fail(pname, t, "got not ok program")
-		} else if expr := toExpression(program.Statements[0]); expr == nil {
-			fail(pname, t, "expected expression")
-		} else if literal := toIdentifier(expr); literal == nil {
-			fail(pname, t, "expected identifier")
-		} else if literal.TokenLiteral() != "foobar" {
-			fail(pname, t, "expected token literal foobar, got: %s", literal.TokenLiteral())
-		} else {
-			success(pname, t, "parser %s passed with result %s", pname, program)
-		}
+	for pname, parser := range testParsers(&lxr).initPratt().initCombinator(combinator.IdentifierExpr).parsers {
+		t.Run(pname, func(t *testing.T) {
+			t.Logf("testing parser %s", pname)
+			program, ok := parser.ParseProgram()
+			if !ok {
+				t.Fatalf("parser returned error")
+			}
+			if len(program.Statements) != 1 {
+				t.Fatalf("expected 1 statement, got %d", len(program.Statements))
+			}
+			stmt := program.Statements[0]
+			if stmt.Dump(1) != expectedAst.Dump(1) {
+				t.Fatalf("expected %s, got %s", expectedAst.Dump(1), stmt.Dump(1))
+			}
+		})
 	}
 }

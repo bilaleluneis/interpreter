@@ -21,7 +21,11 @@ func IntExpr[L lexer.LexerConstraint[L]](l L) Result[L] {
 func IdentifierExpr[L lexer.LexerConstraint[L]](l L) Result[L] {
 	if identTok := l.NextToken(); identTok.Type == token.IDENTIFIER {
 		ident := ast.Identifier{Tok: identTok, Value: identTok.Literal}
-		return Result[L]{l, ast.ExpressionStatement{Exprssn: &ident}}
+		expr := ast.ExpressionStatement{
+			Tok:     identTok,
+			Exprssn: &ident,
+		}
+		return Result[L]{l, expr}
 	}
 	return Result[L]{l, ast.Error{Message: "Failed to parse identifier expression"}}
 }

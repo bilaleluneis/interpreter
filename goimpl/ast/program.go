@@ -25,11 +25,6 @@ func (p *Program) String() string {
 	return out
 }
 
-// Top will return the last statement from the program, wont remove it
-func (p Program) Top() string {
-	return p.Statements[len(p.Statements)-1].String()
-}
-
 func (p Program) Dump(ident int) string {
 	out := "\n---- Program Dump Start ----\n"
 	out += "ast.Program{ //start of Program\n"

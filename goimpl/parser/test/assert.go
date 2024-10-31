@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+//FIXME: might not need this file and utils
+
 func toExpression(stmt ast.Statement) ast.Expression {
 	if ptr, ok := stmt.(*ast.ExpressionStatement); ok {
 		return ptr.Exprssn

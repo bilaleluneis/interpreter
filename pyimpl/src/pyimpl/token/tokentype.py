@@ -1,4 +1,6 @@
-from enum import UNIQUE, verify, StrEnum, EnumMeta
+"""_MetaEnum defines the TokenType enum which represents the possible token types."""
+
+from enum import UNIQUE, EnumMeta, StrEnum, verify
 from typing import Any
 
 

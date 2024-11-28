@@ -1,7 +1,6 @@
 #![allow(dead_code)]
+extern crate core;
 
-mod token;
-pub mod lexer;
 pub mod lazy;
-
-
+pub mod lexer;
+pub mod token;

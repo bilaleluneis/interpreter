@@ -1,5 +1,5 @@
 [workspace]
 
-members = ["parser","scanner"]
+members = ["parser","scanner", "ast"]
 
 resolver = "2" # use 2021 edition as default for all crates

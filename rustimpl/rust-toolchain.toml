@@ -1,2 +1,3 @@
 [toolchain]
 channel = "nightly"
+components = ["rustc", "cargo", "rust-std", "rustc-dev", "llvm-tools-preview"]

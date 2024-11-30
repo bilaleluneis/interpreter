@@ -1,15 +1,14 @@
 package test
 
 import (
-	"fmt"
+	"goimpl/ast"
 	"goimpl/lexer"
 	"goimpl/parser/combinator"
 	"goimpl/token"
 	"testing"
 )
 
-// TODO: test doesnt not check Value on return statement
-func TestReturnStatment(t *testing.T) {
+func TestReturnStatement(t *testing.T) {
 	// return 5;
 	l := lexer.NewStubLexer([]token.Token{
 		{Type: token.RETURN, Literal: "return"},
@@ -18,14 +17,28 @@ func TestReturnStatment(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	})
 
+	expectedAst := &ast.Return{
+		Tok: token.Token{Type: token.RETURN, Literal: "return"},
+		Value: &ast.IntegerLiteral{
+			Tok:   token.Token{Type: token.INT, Literal: "5"},
+			Value: 5,
+		},
+	}
+
 	for pname, parser := range testParsers(&l).initPratt().initCombinator(combinator.Retrn).parsers {
-		fmt.Printf("invoking parser: %s\n", pname)
-		if program, ok := parser.ParseProgram(); !ok {
-			fail(pname, t, "got not ok program")
-		} else if toReturn(program.Statements[0]) == nil {
-			fail(pname, t, "expected return statement")
-		} else {
-			success(pname, t, "parser %s passed with result %s", pname, program)
-		}
+		t.Run(pname, func(t *testing.T) {
+			t.Logf("testing parser %s", pname)
+			program, ok := parser.ParseProgram()
+			if !ok {
+				t.Fatalf("expected ok program got !ok")
+			}
+			if len(program.Statements) != 1 {
+				t.Fatalf("expected 1 statement, got %d", len(program.Statements))
+			}
+			stmt := program.Statements[0]
+			if stmt.Dump(1) != expectedAst.Dump(1) {
+				t.Fatalf("expected %s, got %s", expectedAst.Dump(1), stmt.Dump(1))
+			}
+		})
 	}
 }

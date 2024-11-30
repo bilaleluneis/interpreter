@@ -1,6 +1,7 @@
 package test
 
 import (
+	"goimpl/ast"
 	"goimpl/lexer"
 	"goimpl/parser/combinator"
 	"goimpl/token"
@@ -12,6 +13,7 @@ var infixTests = []struct {
 	expectedOp    string
 	expectedRight string
 	lexr          lexer.StubLexer
+	expectedAst   *ast.InfixExpression
 }{
 	// 5 + 5;
 	{"5", "+", "5", lexer.NewStubLexer([]token.Token{
@@ -19,32 +21,36 @@ var infixTests = []struct {
 		{Type: token.PLUS, Literal: "+"},
 		{Type: token.INT, Literal: "5"},
 		{Type: token.SEMICOLON, Literal: ";"},
-		{Type: token.EOF, Literal: ""},
-	})},
+		{Type: token.EOF, Literal: ""}}),
+		&ast.InfixExpression{
+			Left:     &ast.IntegerLiteral{Tok: token.Token{Type: token.INT, Literal: "5"}, Value: 5},
+			Operator: "+",
+			Right:    &ast.IntegerLiteral{Tok: token.Token{Type: token.INT, Literal: "5"}, Value: 5},
+		},
+	},
 }
 
 func TestInfixExpression(t *testing.T) {
 	for _, tt := range infixTests {
 		for pname, parser := range testParsers(&tt.lexr).initPratt().initCombinator(combinator.InfixInt).parsers {
-			if program, ok := parser.ParseProgram(); !ok {
-				fail(pname, t, "nexpected ok program got !ok")
-			} else if expr := toExpression(program.Statements[0]); expr == nil {
-				fail(pname, t, "\nexpected *ast.ExpressionStatement, got: %T", program.Statements[0])
-			} else if infix := toInfixExpression(expr); infix == nil {
-				fail(pname, t, "\nexpected *ast.InfixExpression")
-			} else if infix.Operator != tt.expectedOp {
-				fail(pname, t, "\nexpected operator %s, got: %s", tt.expectedOp, infix.Operator)
-			} else if leftExpr := toIntegerLiteral(infix.Left); leftExpr == nil {
-				fail(pname, t, "\nexpected *ast.IntegerLiteral")
-			} else if leftExpr.TokenLiteral() != tt.expectedLeft {
-				fail(pname, t, "\nexpected token literal %s, got: %s", tt.expectedLeft, leftExpr.TokenLiteral())
-			} else if right := toIntegerLiteral(infix.Right); right == nil {
-				fail(pname, t, "\nexpected *ast.IntegerLiteral")
-			} else if right.TokenLiteral() != tt.expectedRight {
-				fail(pname, t, "\nexpected token literal %s, got: %s", tt.expectedRight, right.TokenLiteral())
-			} else {
-				success(pname, t, "parser %s passed with result %s", pname, program)
-			}
+			t.Run(pname, func(t *testing.T) {
+				t.Logf("testing parser %s", pname)
+				program, ok := parser.ParseProgram()
+				if !ok {
+					t.Fatalf("expected ok program got !ok")
+				}
+				if len(program.Statements) != 1 {
+					t.Fatalf("expected 1 statement, got %d", len(program.Statements))
+				}
+				stmt := program.Statements[0]
+				exprStmt, ok := stmt.(*ast.ExpressionStatement)
+				if !ok {
+					t.Fatalf("expected *ast.ExpressionStatement, got %T", stmt)
+				}
+				if exprStmt.Exprssn.Dump(1) != tt.expectedAst.Dump(1) {
+					t.Fatalf("expected %s, got %s", tt.expectedAst.Dump(1), exprStmt.Exprssn.Dump(1))
+				}
+			})
 		}
 	}
 }

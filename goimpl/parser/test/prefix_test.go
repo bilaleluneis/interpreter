@@ -1,6 +1,7 @@
 package test
 
 import (
+	"goimpl/ast"
 	"goimpl/lexer"
 	"goimpl/parser/combinator"
 	"goimpl/token"
@@ -15,40 +16,54 @@ var prefixTests = []struct {
 	expectedOperator string
 	expectedValue    int64
 	lexr             lexer.StubLexer
+	expectedAst      *ast.PrefixExpression
 }{
 	// -5;
 	{"-", 5, lexer.NewStubLexer([]token.Token{
 		{Type: token.MINUS, Literal: "-"},
 		{Type: token.INT, Literal: "5"},
 		{Type: token.SEMICOLON, Literal: ";"},
-		{Type: token.EOF, Literal: ""}})},
+		{Type: token.EOF, Literal: ""}}),
+		&ast.PrefixExpression{
+			Operator: "-",
+			Right:    &ast.IntegerLiteral{Tok: token.Token{Type: token.INT, Literal: "5"}, Value: 5},
+		},
+	},
 
 	// !5;
-	{"!", 5, lexer.StubLexer([]token.Token{
+	{"!", 5, lexer.NewStubLexer([]token.Token{
 		{Type: token.BANG, Literal: "!"},
 		{Type: token.INT, Literal: "5"},
 		{Type: token.SEMICOLON, Literal: ";"},
-		{Type: token.EOF, Literal: ""}})},
+		{Type: token.EOF, Literal: ""}}),
+		&ast.PrefixExpression{
+			Operator: "!",
+			Right:    &ast.IntegerLiteral{Tok: token.Token{Type: token.INT, Literal: "5"}, Value: 5},
+		},
+	},
 }
 
 func TestPrefixExpression(t *testing.T) {
 	for _, tt := range prefixTests {
 		for pname, parser := range testParsers(&tt.lexr).initPratt().initCombinator(combinator.PrefixInt).parsers {
-			if program, ok := parser.ParseProgram(); !ok {
-				fail(pname, t, "expected ok program got !ok")
-			} else if expr := toExpression(program.Statements[0]); expr == nil {
-				fail(pname, t, "expected expression got nil")
-			} else if prefix := toPrefixExpression(expr); prefix == nil {
-				fail(pname, t, "expected ast.PrefixExpression")
-			} else if prefix.Operator != tt.expectedOperator {
-				fail(pname, t, "expected operator %s, got: %s", tt.expectedOperator, prefix.Operator)
-			} else if literal := toIntegerLiteral(prefix.Right); literal == nil {
-				fail(pname, t, "expected right side of expression to be and integer literal")
-			} else if literal.Value != tt.expectedValue {
-				fail(pname, t, "expected value %d, got: %d", tt.expectedValue, literal.Value)
-			} else {
-				success(pname, t, "parser %s passed with result %s", pname, program)
-			}
+			t.Run(pname, func(t *testing.T) {
+				t.Logf("testing parser %s", pname)
+				program, ok := parser.ParseProgram()
+				if !ok {
+					t.Fatalf("expected ok program got !ok")
+				}
+				if len(program.Statements) != 1 {
+					t.Fatalf("expected 1 statement, got %d", len(program.Statements))
+				}
+				stmt := program.Statements[0]
+				exprStmt, ok := stmt.(*ast.ExpressionStatement)
+				if !ok {
+					t.Fatalf("expected *ast.ExpressionStatement, got %T", stmt)
+				}
+				if exprStmt.Exprssn.Dump(1) != tt.expectedAst.Dump(1) {
+					t.Fatalf("expected %s, got %s", tt.expectedAst.Dump(1), exprStmt.Exprssn.Dump(1))
+				}
+			})
 		}
 	}
 }

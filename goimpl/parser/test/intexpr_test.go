@@ -1,6 +1,7 @@
 package test
 
 import (
+	"goimpl/ast"
 	"goimpl/lexer"
 	"goimpl/parser/combinator"
 	"goimpl/token"
@@ -8,24 +9,31 @@ import (
 )
 
 func TestIntLiteralExpr(t *testing.T) {
-	// 5;
-	l := lexer.NewStubLexer([]token.Token{
+	var lxr = lexer.NewStubLexer([]token.Token{
 		{Type: token.INT, Literal: "5"},
 		{Type: token.SEMICOLON, Literal: ";"},
 		{Type: token.EOF, Literal: ""},
 	})
 
-	for pname, parser := range testParsers(&l).initPratt().initCombinator(combinator.IntExpr).parsers {
-		if program, ok := parser.ParseProgram(); !ok {
-			fail(pname, t, "got not ok program")
-		} else if expr := toExpression(program.Statements[0]); expr == nil {
-			fail(pname, t, "expected expression")
-		} else if literal := toIntegerLiteral(expr); literal == nil {
-			fail(pname, t, "expected integer literal")
-		} else if literal.TokenLiteral() != "5" {
-			fail(pname, t, "expected token literal 5, got: %s", literal.TokenLiteral())
-		} else {
-			success(pname, t, "parser %s passed with result %s", pname, program)
-		}
+	var expectedAst = &ast.ExpressionStatement{
+		Tok:     token.Token{Type: token.INT, Literal: "5"},
+		Exprssn: &ast.IntegerLiteral{Tok: token.Token{Type: token.INT, Literal: "5"}, Value: 5},
+	}
+
+	for pname, parser := range testParsers(&lxr).initPratt().initCombinator(combinator.IntExpr).parsers {
+		t.Run(pname, func(t *testing.T) {
+			t.Logf("testing parser %s", pname)
+			program, ok := parser.ParseProgram()
+			if !ok {
+				t.Fatalf("parser returned error")
+			}
+			if len(program.Statements) != 1 {
+				t.Fatalf("expected 1 statement, got %d", len(program.Statements))
+			}
+			stmt := program.Statements[0]
+			if stmt.Dump(1) != expectedAst.Dump(1) {
+				t.Fatalf("expected: \n %s \n got: \n %s \n", expectedAst.Dump(1), stmt.Dump(1))
+			}
+		})
 	}
 }

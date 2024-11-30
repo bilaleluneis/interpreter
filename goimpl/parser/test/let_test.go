@@ -7,6 +7,8 @@ import (
 	"testing"
 )
 
+//FIXME: tests are not complete
+
 func TestParseLetStatement(t *testing.T) {
 	// let x = 5;
 	l := lexer.NewStubLexer([]token.Token{

@@ -1,4 +1,4 @@
-package token
+package lex
 
 sealed interface Token
 

@@ -1,8 +1,5 @@
 package lex
 
-import token.Eof
-import token.Token
-import token.lookup
 import java.io.Serializable
 
 

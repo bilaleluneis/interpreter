@@ -2,7 +2,6 @@ package lex
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import token.*
 
 internal class LexerTest {
 

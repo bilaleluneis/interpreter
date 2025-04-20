@@ -50,6 +50,7 @@ func (p *Parser) ParseProgram() (ast.Program, bool) {
 	var parsedStatements []ast.Statement
 	for stmt := p.parseStatement(); len(p.errors) == 0; stmt = p.parseStatement() {
 		parsedStatements = append(parsedStatements, stmt)
+
 		p.nextToken()
 		if p.peekTok.Type == token.EOF {
 			break

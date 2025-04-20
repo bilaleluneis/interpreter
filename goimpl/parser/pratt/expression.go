@@ -11,15 +11,19 @@ import (
 func (p *Parser) parseExpression(precedence internal.Precidence) ast.Expression {
 	prefix := p.prefixParseFns[p.currTok.Type]
 	if prefix == nil {
-		p.errors = append(p.errors, fmt.Sprintf("no prefix parse function for %s found", p.currTok.Type))
+		errorMsg := fmt.Sprintf("no prefix parse function for %s found", p.currTok.Type)
+		p.errors = append(p.errors, errorMsg)
 		return nil
 	}
+
 	leftExpr := prefix(p)
+
 	for p.peekTok.Type != token.SEMICOLON && precedence < p.peekPrecidence() {
 		infix := p.infixParseFns[p.peekTok.Type]
 		if infix == nil {
 			return leftExpr
 		}
+
 		p.nextToken()
 		leftExpr = infix(p, leftExpr)
 	}
@@ -39,9 +43,11 @@ var parseIdentifierExpr PrefixParseFn = func(parser *Parser) ast.Expression {
 }
 
 var parsePrefixExpr PrefixParseFn = func(parser *Parser) ast.Expression {
-	expr := &ast.PrefixExpression{Tok: parser.currTok, Operator: parser.currTok.Literal} //operator ex: ! or -
+	//operator ex: ! or -
+	expr := &ast.PrefixExpression{Tok: parser.currTok, Operator: parser.currTok.Literal}
 	parser.nextToken()
-	expr.Right = parser.parseExpression(internal.PREFIX) //parse the right side of the operator
+	//parse the right side of the operator
+	expr.Right = parser.parseExpression(internal.PREFIX)
 	return expr
 }
 

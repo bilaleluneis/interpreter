@@ -20,6 +20,7 @@ func (p *Parser) parseStatement() ast.Statement {
 
 func (p *Parser) parseLetStatment() ast.Statement {
 	stmt := &ast.Let{Tok: p.currTok}
+
 	if p.peekTok.Type != token.IDENTIFIER {
 		p.errors = append(p.errors, fmt.Sprintf("expected IDENTIFIER, got %s", p.peekTok.Type))
 		return nil
@@ -63,11 +64,13 @@ func (p *Parser) invalidStatment() ast.Statement {
 func (p *Parser) parseExpressionStatement() ast.Statement {
 	if expression := p.parseExpression(internal.LOWEST); expression != nil {
 		stmt := &ast.ExpressionStatement{Tok: p.currTok, Exprssn: expression}
+
 		if p.peekTok.Type == token.SEMICOLON {
 			p.nextToken()
 			return stmt
 		}
 	}
-	p.errors = append(p.errors, fmt.Sprintf("could not parse expression statement"))
+
+	p.errors = append(p.errors, "could not parse expression statement")
 	return nil
 }

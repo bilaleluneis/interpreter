@@ -8,11 +8,12 @@ import (
 	"strconv"
 )
 
+// parseExpression implements the Pratt parsing algorithm for expressions with operator precedence.
 func (p *Parser) parseExpression(precedence internal.Precidence) ast.Expression {
 	prefix := p.prefixParseFns[p.currTok.Type]
 	if prefix == nil {
-		errorMsg := fmt.Sprintf("no prefix parse function for %s found", p.currTok.Type)
-		p.errors = append(p.errors, errorMsg)
+		msg := fmt.Sprintf("no prefix parse function for %s found", p.currTok.Type)
+		p.errors = append(p.errors, msg)
 		return nil
 	}
 
@@ -30,38 +31,74 @@ func (p *Parser) parseExpression(precedence internal.Precidence) ast.Expression 
 	return leftExpr
 }
 
-var parseInfixExpr InfixParseFn = func(parser *Parser, left ast.Expression) ast.Expression {
-	expr := &ast.InfixExpression{Tok: parser.currTok, Operator: parser.currTok.Literal, Left: left}
-	precedence := parser.currPrecidence()
-	parser.nextToken()
-	expr.Right = parser.parseExpression(precedence)
-	return expr
-}
-
-var parseIdentifierExpr PrefixParseFn = func(parser *Parser) ast.Expression {
-	return &ast.Identifier{Tok: parser.currTok, Value: parser.currTok.Literal}
-}
-
-var parsePrefixExpr PrefixParseFn = func(parser *Parser) ast.Expression {
-	//operator ex: ! or -
-	expr := &ast.PrefixExpression{Tok: parser.currTok, Operator: parser.currTok.Literal}
-	parser.nextToken()
-	//parse the right side of the operator
-	expr.Right = parser.parseExpression(internal.PREFIX)
-	return expr
-}
-
-var parseIntegerLiteral PrefixParseFn = func(parser *Parser) ast.Expression {
-	literal := &ast.IntegerLiteral{Tok: parser.currTok}
-	if value, err := strconv.ParseInt(parser.currTok.Literal, 0, 64); err == nil {
-		literal.Value = value
-		return literal
+// Parser functions for different expression types.
+var (
+	// parseInfixExpr handles operators like +, -, *, /, ==, etc.
+	parseInfixExpr InfixParseFn = func(parser *Parser, left ast.Expression) ast.Expression {
+		expr := &ast.InfixExpression{
+			Tok:      parser.currTok,
+			Operator: parser.currTok.Literal,
+			Left:     left,
+		}
+		precedence := parser.currPrecidence()
+		parser.nextToken()
+		expr.Right = parser.parseExpression(precedence)
+		return expr
 	}
-	err := "could not parse " + parser.currTok.Literal + " as integer"
-	parser.errors = append(parser.errors, err)
-	return nil
-}
 
-var parseBooleanExpr PrefixParseFn = func(parser *Parser) ast.Expression {
-	return &ast.Boolean{Tok: parser.currTok, Value: parser.currTok.Type == token.TRUE}
-}
+	// parseIdentifierExpr handles variable names and other identifiers.
+	parseIdentifierExpr PrefixParseFn = func(parser *Parser) ast.Expression {
+		return &ast.Identifier{
+			Tok:   parser.currTok,
+			Value: parser.currTok.Literal,
+		}
+	}
+
+	// parsePrefixExpr handles unary operators like ! and - .
+	parsePrefixExpr PrefixParseFn = func(parser *Parser) ast.Expression {
+		expr := &ast.PrefixExpression{
+			Tok:      parser.currTok,
+			Operator: parser.currTok.Literal,
+		}
+		parser.nextToken()
+		expr.Right = parser.parseExpression(internal.PREFIX)
+		return expr
+	}
+
+	// parseIntegerLiteral handles numeric literals.
+	parseIntegerLiteral PrefixParseFn = func(parser *Parser) ast.Expression {
+		literal := &ast.IntegerLiteral{Tok: parser.currTok}
+		value, err := strconv.ParseInt(parser.currTok.Literal, 0, 64)
+		if err == nil {
+			literal.Value = value
+			return literal
+		}
+		msg := "could not parse " + parser.currTok.Literal + " as integer"
+		parser.errors = append(parser.errors, msg)
+		return nil
+	}
+
+	// parseBooleanExpr handles true/false literals.
+	parseBooleanExpr PrefixParseFn = func(parser *Parser) ast.Expression {
+		return &ast.Boolean{
+			Tok:   parser.currTok,
+			Value: parser.currTok.Type == token.TRUE,
+		}
+	}
+
+	// parseGroupedExpression handles expressions in parentheses.
+	parseGroupedExpression PrefixParseFn = func(parser *Parser) ast.Expression {
+		parser.nextToken() // consume the '('
+
+		expr := parser.parseExpression(internal.LOWEST)
+
+		if parser.peekTok.Type != token.RPRAN {
+			msg := "expected )"
+			parser.errors = append(parser.errors, msg)
+			return nil
+		}
+
+		parser.nextToken() // consume the ')'
+		return expr
+	}
+)

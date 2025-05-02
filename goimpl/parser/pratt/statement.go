@@ -7,34 +7,43 @@ import (
 	"goimpl/token"
 )
 
+// Statement parsing methods for the Pratt parser
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.currTok.Type {
 	case token.LET:
-		return p.parseLetStatment()
+		return p.parseLetStatement()
 	case token.RETURN:
-		return p.parseReturnStatment()
+		return p.parseReturnStatement()
 	default:
 		return p.parseExpressionStatement()
 	}
 }
 
-func (p *Parser) parseLetStatment() ast.Statement {
+// parseLetStatement parses a let statement in the form: let <identifier> = <expression>;
+func (p *Parser) parseLetStatement() ast.Statement {
 	stmt := &ast.Let{Tok: p.currTok}
 
 	if p.peekTok.Type != token.IDENTIFIER {
-		p.errors = append(p.errors, fmt.Sprintf("expected IDENTIFIER, got %s", p.peekTok.Type))
+		msg := fmt.Sprintf("expected IDENTIFIER, got %s", p.peekTok.Type)
+		p.errors = append(p.errors, msg)
 		return nil
 	}
 
 	p.nextToken()
-	stmt.Name = &ast.Identifier{Tok: p.currTok, Value: p.currTok.Literal}
+	stmt.Name = &ast.Identifier{
+		Tok:   p.currTok,
+		Value: p.currTok.Literal,
+	}
+
 	if p.peekTok.Type != token.ASSIGN {
-		p.errors = append(p.errors, fmt.Sprintf("expected ASSIGN, got %s", p.peekTok.Type))
+		msg := fmt.Sprintf("expected ASSIGN, got %s", p.peekTok.Type)
+		p.errors = append(p.errors, msg)
 		return nil
 	}
 
 	p.nextToken() // consume the ASSIGN token
 	p.nextToken() // consume the value token (expression)
+
 	if expr := p.parseExpression(internal.LOWEST); expr != nil {
 		stmt.Value = expr
 	} else {
@@ -48,17 +57,20 @@ func (p *Parser) parseLetStatment() ast.Statement {
 	return stmt
 }
 
-// FIXME: at the moment value is not captured, just skipping until we find a semicolon
-func (p *Parser) parseReturnStatment() ast.Statement {
+func (p *Parser) parseReturnStatement() ast.Statement {
 	stmt := &ast.Return{Tok: p.currTok}
-	//FIXME: Implement the rest of the parsing logic, skipping expression at the moment
-	for p.nextToken(); p.currTok.Type != token.SEMICOLON; p.nextToken() {
-	}
-	return stmt
-}
 
-func (p *Parser) invalidStatment() ast.Statement {
-	return ast.Error{Message: fmt.Sprintf("invalid token %s", p.currTok.Type)}
+	p.nextToken() // consume 'return' token
+
+	// Parse the return value expression
+	stmt.Value = p.parseExpression(internal.LOWEST)
+
+	// Advance until semicolon if present
+	if p.peekTok.Type == token.SEMICOLON {
+		p.nextToken()
+	}
+
+	return stmt
 }
 
 func (p *Parser) parseExpressionStatement() ast.Statement {

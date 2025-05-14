@@ -16,11 +16,10 @@ func (Let) statmentNode() {}
 func (l Let) TokenLiteral() string { return l.Tok.Literal }
 
 func (l Let) String() string {
-	out := l.Tok.Literal + " " + l.Name.String() + " = "
-	if l.Value != nil {
-		out += l.Value.String()
+	if l.Name != nil && l.Value != nil {
+		return "let " + l.Name.Value + " = " + l.Value.String() + ";"
 	}
-	return out + ";"
+	return "let <incomplete>"
 }
 
 func (l Let) Dump(ident int) string {

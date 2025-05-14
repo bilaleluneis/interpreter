@@ -50,8 +50,17 @@ func (p *Parser) parseLetStatement() ast.Statement {
 		return nil
 	}
 
-	for p.currTok.Type != token.SEMICOLON {
+	// FIXME: look at bellow , I need to return ast.Error instead when parsing fails
+
+	// Advance until we find a semicolon or EOF
+	for p.currTok.Type != token.SEMICOLON && p.currTok.Type != token.EOF {
 		p.nextToken()
+	}
+
+	if p.currTok.Type == token.EOF {
+		msg := fmt.Sprintf("expected semicolon, got EOF")
+		p.errors = append(p.errors, msg)
+		return nil
 	}
 
 	return stmt

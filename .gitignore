@@ -38,3 +38,5 @@ monkey-ide/gradle.properties
 interpreter.iml
 .idea
 
+goimpl/.github/ai-instructions.md
+goimpl/.github/custom-instructions.md

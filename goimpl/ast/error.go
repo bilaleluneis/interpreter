@@ -8,7 +8,12 @@ type Error struct {
 
 func (Error) statmentNode()          {}
 func (e Error) TokenLiteral() string { return e.Message }
-func (e Error) String() string       { return e.Message }
+func (e Error) String() string {
+	if e.Message != "" {
+		return "Error{" + e.Message + "}"
+	}
+	return e.Message
+}
 
 func (e Error) Dump(ident int) string {
 	identation := strings.Repeat("\t", ident)

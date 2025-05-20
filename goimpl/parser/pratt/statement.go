@@ -21,12 +21,12 @@ func (p *Parser) parseStatement() ast.Statement {
 
 // parseLetStatement parses a let statement in the form: let <identifier> = <expression>;
 func (p *Parser) parseLetStatement() ast.Statement {
+	errStmt := &ast.Error{}
 	stmt := &ast.Let{Tok: p.currTok}
 
 	if p.peekTok.Type != token.IDENTIFIER {
-		msg := fmt.Sprintf("expected IDENTIFIER, got %s", p.peekTok.Type)
-		p.errors = append(p.errors, msg)
-		return nil
+		errStmt.Message = fmt.Sprintf(internal.LetErrExpectedIdentifier, p.peekTok.Type)
+		return errStmt
 	}
 
 	p.nextToken()
@@ -36,9 +36,8 @@ func (p *Parser) parseLetStatement() ast.Statement {
 	}
 
 	if p.peekTok.Type != token.ASSIGN {
-		msg := fmt.Sprintf("expected ASSIGN, got %s", p.peekTok.Type)
-		p.errors = append(p.errors, msg)
-		return nil
+		errStmt.Message = fmt.Sprintf(internal.LetErrExpectedAssign, p.peekTok.Type)
+		return errStmt
 	}
 
 	p.nextToken() // consume the ASSIGN token
@@ -47,10 +46,9 @@ func (p *Parser) parseLetStatement() ast.Statement {
 	if expr := p.parseExpression(internal.LOWEST); expr != nil {
 		stmt.Value = expr
 	} else {
-		return nil
+		errStmt.Message = fmt.Sprintf(internal.LetErrExpectedExpression, p.currTok.Type)
+		return errStmt
 	}
-
-	// FIXME: look at bellow , I need to return ast.Error instead when parsing fails
 
 	// Advance until we find a semicolon or EOF
 	for p.currTok.Type != token.SEMICOLON && p.currTok.Type != token.EOF {
@@ -58,9 +56,8 @@ func (p *Parser) parseLetStatement() ast.Statement {
 	}
 
 	if p.currTok.Type == token.EOF {
-		msg := fmt.Sprintf("expected semicolon, got EOF")
-		p.errors = append(p.errors, msg)
-		return nil
+		errStmt.Message = fmt.Sprintf(internal.LetErrExpectedSemicolon, token.EOF)
+		return errStmt
 	}
 
 	return stmt
@@ -92,6 +89,9 @@ func (p *Parser) parseExpressionStatement() ast.Statement {
 		}
 	}
 
-	p.errors = append(p.errors, "could not parse expression statement")
-	return nil
+	return &ast.Error{
+		//FIXME: add error message
+		// Message: fmt.Sprintf(internal.ExprErrExpectedSemicolon, p.peekTok.Type),
+	}
+
 }

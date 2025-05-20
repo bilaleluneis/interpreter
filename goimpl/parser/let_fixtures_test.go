@@ -1,12 +1,16 @@
 package parser
 
-import "goimpl/token"
+import (
+	"fmt"
+	"goimpl/parser/internal"
+	"goimpl/token"
+)
 
 type letTestCase struct {
 	tokens   []token.Token
 	wantErr  bool
-	checkVal bool
-	expected string
+	errorMsg string // expected error message when wantErr is true
+	expected string // expected string representation for valid cases
 }
 
 var letStatementTests = map[string]letTestCase{
@@ -19,8 +23,6 @@ var letStatementTests = map[string]letTestCase{
 			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
-		wantErr:  false,
-		checkVal: true,
 		expected: "let x = 5;",
 	},
 	"missing_identifier": {
@@ -32,7 +34,7 @@ var letStatementTests = map[string]letTestCase{
 			{Type: token.EOF, Literal: ""},
 		},
 		wantErr:  true,
-		checkVal: false,
+		errorMsg: fmt.Sprintf(internal.LetErrExpectedIdentifier, token.ASSIGN),
 	},
 	"missing_assign": {
 		tokens: []token.Token{
@@ -43,7 +45,7 @@ var letStatementTests = map[string]letTestCase{
 			{Type: token.EOF, Literal: ""},
 		},
 		wantErr:  true,
-		checkVal: false,
+		errorMsg: fmt.Sprintf(internal.LetErrExpectedAssign, token.INT),
 	},
 	"missing_semicolon": {
 		tokens: []token.Token{
@@ -54,6 +56,6 @@ var letStatementTests = map[string]letTestCase{
 			{Type: token.EOF, Literal: ""},
 		},
 		wantErr:  true,
-		checkVal: false,
+		errorMsg: fmt.Sprintf(internal.LetErrExpectedSemicolon, token.EOF),
 	},
 }

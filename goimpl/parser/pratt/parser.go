@@ -10,7 +10,6 @@ type Parser struct {
 	lexer          lexer.Lexer
 	currTok        token.Token
 	peekTok        token.Token
-	errors         []string
 	prefixParseFns map[token.TokenType]PrefixParseFn
 	infixParseFns  map[token.TokenType]InfixParseFn
 }
@@ -21,7 +20,6 @@ type InfixParseFn func(*Parser, ast.Expression) ast.Expression
 func New(l lexer.Lexer) *Parser {
 	p := &Parser{
 		lexer:          l,
-		errors:         make([]string, 0),
 		prefixParseFns: make(map[token.TokenType]PrefixParseFn),
 		infixParseFns:  make(map[token.TokenType]InfixParseFn),
 	}
@@ -61,18 +59,17 @@ func New(l lexer.Lexer) *Parser {
 	return p
 }
 
-func (p *Parser) Errors() []string {
-	return p.errors
-}
-
-func (p *Parser) ParseProgram() (ast.Program, bool) {
+func (p *Parser) ParseProgram() ast.Program {
 	var parsedStatements []ast.Statement
-	for stmt := p.parseStatement(); len(p.errors) == 0; stmt = p.parseStatement() {
+	for p.currTok.Type != token.EOF {
+		stmt := p.parseStatement()
 		parsedStatements = append(parsedStatements, stmt)
-		p.nextToken()
-		if p.peekTok.Type == token.EOF {
-			break
+		switch stmt.(type) {
+		case *ast.Error:
+			return ast.Program{Statements: parsedStatements}
+		default:
+			p.nextToken()
 		}
 	}
-	return ast.Program{Statements: parsedStatements}, len(p.errors) == 0
+	return ast.Program{Statements: parsedStatements}
 }

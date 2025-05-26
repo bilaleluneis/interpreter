@@ -7,10 +7,9 @@ import (
 )
 
 type letTestCase struct {
-	tokens   []token.Token
-	wantErr  bool
-	errorMsg string // expected error message when wantErr is true
-	expected string // expected string representation for valid cases
+	tokens            []token.Token
+	expectedErrMsg    string // Non-empty if an error is expected
+	expectedStatement string // Non-empty if a valid statement is expected
 }
 
 var letStatementTests = map[string]letTestCase{
@@ -23,7 +22,7 @@ var letStatementTests = map[string]letTestCase{
 			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
-		expected: "let x = 5;",
+		expectedStatement: "let x = 5;",
 	},
 	"missing_identifier": {
 		tokens: []token.Token{
@@ -33,8 +32,7 @@ var letStatementTests = map[string]letTestCase{
 			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
-		wantErr:  true,
-		errorMsg: fmt.Sprintf(internal.LetErrExpectedIdentifier, token.ASSIGN),
+		expectedErrMsg: fmt.Sprintf(internal.LetErrExpectedIdentifier, token.ASSIGN),
 	},
 	"missing_assign": {
 		tokens: []token.Token{
@@ -44,8 +42,7 @@ var letStatementTests = map[string]letTestCase{
 			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
-		wantErr:  true,
-		errorMsg: fmt.Sprintf(internal.LetErrExpectedAssign, token.INT),
+		expectedErrMsg: fmt.Sprintf(internal.LetErrExpectedAssign, token.INT),
 	},
 	"missing_semicolon": {
 		tokens: []token.Token{
@@ -55,7 +52,6 @@ var letStatementTests = map[string]letTestCase{
 			{Type: token.INT, Literal: "5"},
 			{Type: token.EOF, Literal: ""},
 		},
-		wantErr:  true,
-		errorMsg: fmt.Sprintf(internal.LetErrExpectedSemicolon, token.EOF),
+		expectedErrMsg: fmt.Sprintf(internal.LetErrExpectedSemicolon, token.EOF),
 	},
 }

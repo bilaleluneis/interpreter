@@ -1,6 +1,7 @@
 package pratt
 
 import (
+	"fmt"
 	"goimpl/ast"
 	"goimpl/parser/internal"
 	"goimpl/token"
@@ -11,9 +12,9 @@ import (
 func (p *Parser) parseExpression(precedence internal.Precidence) ast.Expression {
 	prefix := p.prefixParseFns[p.currTok.Type]
 	if prefix == nil {
-		// FIXME: need to return as.Error
-		//fmt.Sprintf("no prefix parse function for %s found", p.currTok.Type)
-		return nil
+		return &ast.InvalidExpression{
+			Message: fmt.Sprintf(internal.ErrExpectedPrefixParseFn, p.currTok.Type),
+		}
 	}
 
 	leftExpr := prefix(p)
@@ -72,9 +73,9 @@ var (
 			literal.Value = value
 			return literal
 		}
-		//FIXME: need to return as.Error
-		//"could not parse " + parser.currTok.Literal + " as integer"
-		return nil
+		return &ast.InvalidExpression{
+			Message: fmt.Sprintf(internal.ErrExpectedIntegerLiteral, parser.currTok.Literal),
+		}
 	}
 
 	// parseBooleanExpr handles true/false literals.
@@ -92,9 +93,9 @@ var (
 		expr := parser.parseExpression(internal.LOWEST)
 
 		if parser.peekTok.Type != token.RPRAN {
-			//FIXME: need to return as.Error
-			// "expected )"
-			return nil
+			return &ast.InvalidExpression{
+				Message: fmt.Sprintf(internal.ErrExpectedOpenPren, parser.peekTok.Type),
+			}
 		}
 
 		parser.nextToken() // consume the ')'

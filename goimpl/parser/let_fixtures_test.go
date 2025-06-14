@@ -54,4 +54,72 @@ var letStatementTests = map[string]letTestCase{
 		},
 		expectedErrMsg: fmt.Sprintf(internal.LetErrExpectedSemicolon, token.EOF),
 	},
+	"missing_value_expression": {
+		tokens: []token.Token{
+			{Type: token.LET, Literal: "let"},
+			{Type: token.IDENTIFIER, Literal: "x"},
+			{Type: token.ASSIGN, Literal: "="},
+			{Type: token.SEMICOLON, Literal: ";"},
+			{Type: token.EOF, Literal: ""},
+		},
+		expectedErrMsg: fmt.Sprintf(internal.LetErrExpectedExpression, token.SEMICOLON),
+	},
+	"boolean_literal_true": {
+		tokens: []token.Token{
+			{Type: token.LET, Literal: "let"},
+			{Type: token.IDENTIFIER, Literal: "x"},
+			{Type: token.ASSIGN, Literal: "="},
+			{Type: token.TRUE, Literal: "true"},
+			{Type: token.SEMICOLON, Literal: ";"},
+			{Type: token.EOF, Literal: ""},
+		},
+		expectedStatement: "let x = true;",
+	},
+	"boolean_literal_false": {
+		tokens: []token.Token{
+			{Type: token.LET, Literal: "let"},
+			{Type: token.IDENTIFIER, Literal: "x"},
+			{Type: token.ASSIGN, Literal: "="},
+			{Type: token.FALSE, Literal: "false"},
+			{Type: token.SEMICOLON, Literal: ";"},
+			{Type: token.EOF, Literal: ""},
+		},
+		expectedStatement: "let x = false;",
+	},
+	"prfix_expression_not_five": {
+		tokens: []token.Token{
+			{Type: token.LET, Literal: "let"},
+			{Type: token.IDENTIFIER, Literal: "x"},
+			{Type: token.ASSIGN, Literal: "="},
+			{Type: token.BANG, Literal: "!"},
+			{Type: token.INT, Literal: "5"},
+			{Type: token.SEMICOLON, Literal: ";"},
+			{Type: token.EOF, Literal: ""},
+		},
+		expectedStatement: "let x = (!5);",
+	},
+	"prefix_expression_not_y": {
+		tokens: []token.Token{
+			{Type: token.LET, Literal: "let"},
+			{Type: token.IDENTIFIER, Literal: "x"},
+			{Type: token.ASSIGN, Literal: "="},
+			{Type: token.BANG, Literal: "!"},
+			{Type: token.TRUE, Literal: "y"},
+			{Type: token.SEMICOLON, Literal: ";"},
+			{Type: token.EOF, Literal: ""},
+		},
+		expectedStatement: "let x = (!y);",
+	},
+	"prefix_expression_plus_five": {
+		tokens: []token.Token{
+			{Type: token.LET, Literal: "let"},
+			{Type: token.IDENTIFIER, Literal: "x"},
+			{Type: token.ASSIGN, Literal: "="},
+			{Type: token.PLUS, Literal: "+"},
+			{Type: token.INT, Literal: "5"},
+			{Type: token.SEMICOLON, Literal: ";"},
+			{Type: token.EOF, Literal: ""},
+		},
+		expectedStatement: "let x = (+5);",
+	},
 }

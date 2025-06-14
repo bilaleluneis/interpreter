@@ -30,6 +30,7 @@ func New(l lexer.Lexer) *Parser {
 		token.INT:        parseIntegerLiteral,
 		token.BANG:       parsePrefixExpr,
 		token.MINUS:      parsePrefixExpr,
+		token.PLUS:       parsePrefixExpr,
 		token.TRUE:       parseBooleanExpr,
 		token.FALSE:      parseBooleanExpr,
 		token.LPRAN:      parseGroupedExpression,

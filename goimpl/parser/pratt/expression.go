@@ -12,9 +12,9 @@ import (
 func (p *Parser) parseExpression(precedence internal.Precidence) ast.Expression {
 	prefix := p.prefixParseFns[p.currTok.Type]
 	if prefix == nil {
-		msg := fmt.Sprintf("no prefix parse function for %s found", p.currTok.Type)
-		p.errors = append(p.errors, msg)
-		return nil
+		return &ast.InvalidExpression{
+			Message: fmt.Sprintf(internal.ErrExpectedPrefixParseFn, p.currTok.Type),
+		}
 	}
 
 	leftExpr := prefix(p)
@@ -73,9 +73,9 @@ var (
 			literal.Value = value
 			return literal
 		}
-		msg := "could not parse " + parser.currTok.Literal + " as integer"
-		parser.errors = append(parser.errors, msg)
-		return nil
+		return &ast.InvalidExpression{
+			Message: fmt.Sprintf(internal.ErrExpectedIntegerLiteral, parser.currTok.Literal),
+		}
 	}
 
 	// parseBooleanExpr handles true/false literals.
@@ -93,9 +93,9 @@ var (
 		expr := parser.parseExpression(internal.LOWEST)
 
 		if parser.peekTok.Type != token.RPRAN {
-			msg := "expected )"
-			parser.errors = append(parser.errors, msg)
-			return nil
+			return &ast.InvalidExpression{
+				Message: fmt.Sprintf(internal.ErrExpectedOpenPren, parser.peekTok.Type),
+			}
 		}
 
 		parser.nextToken() // consume the ')'

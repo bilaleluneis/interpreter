@@ -21,12 +21,10 @@ func (p *Parser) parseStatement() ast.Statement {
 
 // parseLetStatement parses a let statement in the form: let <identifier> = <expression>;
 func (p *Parser) parseLetStatement() ast.Statement {
-	stmt := &ast.Let{Tok: p.currTok}
+	stmt := &ast.Let{}
 
 	if p.peekTok.Type != token.IDENTIFIER {
-		msg := fmt.Sprintf("expected IDENTIFIER, got %s", p.peekTok.Type)
-		p.errors = append(p.errors, msg)
-		return nil
+		return &ast.Error{Message: fmt.Sprintf(internal.LetErrExpectedIdentifier, p.peekTok.Type)}
 	}
 
 	p.nextToken()
@@ -36,25 +34,30 @@ func (p *Parser) parseLetStatement() ast.Statement {
 	}
 
 	if p.peekTok.Type != token.ASSIGN {
-		msg := fmt.Sprintf("expected ASSIGN, got %s", p.peekTok.Type)
-		p.errors = append(p.errors, msg)
-		return nil
+		return &ast.Error{Message: fmt.Sprintf(internal.LetErrExpectedAssign, p.peekTok.Type)}
 	}
 
 	p.nextToken() // consume the ASSIGN token
 	p.nextToken() // consume the value token (expression)
 
-	if expr := p.parseExpression(internal.LOWEST); expr != nil {
+	expr := p.parseExpression(internal.LOWEST)
+
+	switch expr := expr.(type) {
+	case *ast.InvalidExpression:
+		return &ast.Error{
+			Message: fmt.Sprintf(internal.LetErrExpectedExpression, p.currTok.Literal),
+		}
+
+	default:
 		stmt.Value = expr
-	} else {
-		return nil
+		for p.currTok.Type != token.SEMICOLON && p.currTok.Type != token.EOF {
+			p.nextToken()
+		}
+		if p.currTok.Type == token.EOF {
+			return &ast.Error{Message: fmt.Sprintf(internal.LetErrExpectedSemicolon, token.EOF)}
+		}
+		return stmt
 	}
-
-	for p.currTok.Type != token.SEMICOLON {
-		p.nextToken()
-	}
-
-	return stmt
 }
 
 func (p *Parser) parseReturnStatement() ast.Statement {
@@ -74,15 +77,24 @@ func (p *Parser) parseReturnStatement() ast.Statement {
 }
 
 func (p *Parser) parseExpressionStatement() ast.Statement {
-	if expression := p.parseExpression(internal.LOWEST); expression != nil {
-		stmt := &ast.ExpressionStatement{Tok: p.currTok, Exprssn: expression}
+	var stmt ast.Statement
+	expr := p.parseExpression(internal.LOWEST)
 
-		if p.peekTok.Type == token.SEMICOLON {
-			p.nextToken()
-			return stmt
-		}
+	switch expr := expr.(type) {
+	case *ast.InvalidExpression:
+		return &ast.Error{Message: expr.Message}
+
+	default: // assume it's a valid expression
+		stmt = &ast.ExpressionStatement{Tok: p.currTok, Exprssn: expr}
 	}
 
-	p.errors = append(p.errors, "could not parse expression statement")
-	return nil
+	if p.peekTok.Type == token.SEMICOLON {
+		p.nextToken()
+		return stmt
+	}
+
+	return &ast.Error{
+		Message: fmt.Sprintf(internal.LetErrExpectedSemicolon, p.peekTok.Type),
+	}
+
 }

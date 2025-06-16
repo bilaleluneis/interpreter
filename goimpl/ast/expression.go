@@ -37,3 +37,22 @@ func (e ExpressionStatement) Dump(ident int) string {
 	out += strings.Repeat("\t", ident-1) + "} //end of ExpressionStatment"
 	return out
 }
+
+// InvalidExpression represents an invalid expression encountered during parsing
+type InvalidExpression struct {
+	Message string // error message describing why the expression is invalid
+}
+
+func (InvalidExpression) expressionNode() {}
+
+func (i InvalidExpression) TokenLiteral() string { return i.Message }
+
+func (i InvalidExpression) String() string { return "invalid expression: " + i.Message }
+
+func (i InvalidExpression) Dump(ident int) string {
+	indentation := strings.Repeat("\t", ident)
+	out := indentation + "ast.InvalidExpression{ //start of InvalidExpression\n"
+	out += indentation + "\tMessage: " + i.Message + "\n"
+	out += indentation + "} //end of InvalidExpression"
+	return out
+}

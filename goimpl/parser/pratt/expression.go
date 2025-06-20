@@ -8,6 +8,35 @@ import (
 	"strconv"
 )
 
+type PrefixParseFn func(*Parser) ast.Expression
+type InfixParseFn func(*Parser, ast.Expression) ast.Expression
+
+func (p *Parser) initPrefixParseFns() {
+	p.prefixParseFns = map[token.TokenType]PrefixParseFn{
+		token.IDENTIFIER: parseIdentifierExpr,
+		token.INT:        parseIntegerLiteral,
+		token.BANG:       parsePrefixExpr,
+		token.MINUS:      parsePrefixExpr,
+		token.PLUS:       parsePrefixExpr,
+		token.TRUE:       parseBooleanExpr,
+		token.FALSE:      parseBooleanExpr,
+		token.LPRAN:      parseGroupedExpression,
+	}
+}
+
+func (p *Parser) initInfixParseFns() {
+	p.infixParseFns = map[token.TokenType]InfixParseFn{
+		token.PLUS:  parseInfixExpr,
+		token.MINUS: parseInfixExpr,
+		token.SLASH: parseInfixExpr,
+		token.ASTER: parseInfixExpr,
+		token.EQ:    parseInfixExpr,
+		token.NEQ:   parseInfixExpr,
+		token.LT:    parseInfixExpr,
+		token.GT:    parseInfixExpr,
+	}
+}
+
 // parseExpression implements the Pratt parsing algorithm for expressions with operator precedence.
 func (p *Parser) parseExpression(precedence internal.Precidence) ast.Expression {
 	prefix := p.prefixParseFns[p.currTok.Type]

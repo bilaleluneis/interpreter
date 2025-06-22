@@ -4,7 +4,7 @@ import (
 	"goimpl/parser/internal"
 )
 
-func (p *Parser) nextToken() {
+func (p *Parser) advance() {
 	p.currTok = p.peekTok
 	p.peekTok = p.lexer.NextToken()
 }

@@ -54,7 +54,7 @@ func (p *Parser) parseExpression(precedence internal.Precidence) ast.Expression 
 			return leftExpr
 		}
 
-		p.nextToken()
+		p.advance()
 		leftExpr = infix(p, leftExpr)
 	}
 	return leftExpr
@@ -70,7 +70,7 @@ var (
 			Left:     left,
 		}
 		precedence := parser.currPrecidence()
-		parser.nextToken()
+		parser.advance()
 		expr.Right = parser.parseExpression(precedence)
 		return expr
 	}
@@ -89,7 +89,7 @@ var (
 			Tok:      parser.currTok,
 			Operator: parser.currTok.Literal,
 		}
-		parser.nextToken()
+		parser.advance()
 		expr.Right = parser.parseExpression(internal.PREFIX)
 		return expr
 	}
@@ -117,7 +117,7 @@ var (
 
 	// parseGroupedExpression handles expressions in parentheses.
 	parseGroupedExpression PrefixParseFn = func(parser *Parser) ast.Expression {
-		parser.nextToken() // consume the '('
+		parser.advance() // consume the '('
 
 		expr := parser.parseExpression(internal.LOWEST)
 
@@ -127,7 +127,7 @@ var (
 			}
 		}
 
-		parser.nextToken() // consume the ')'
+		parser.advance() // consume the ')'
 		return expr
 	}
 )

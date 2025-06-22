@@ -27,7 +27,7 @@ func (p *Parser) parseLetStatement() ast.Statement {
 		return &ast.Error{Message: fmt.Sprintf(internal.LetErrExpectedIdentifier, p.peekTok.Type)}
 	}
 
-	p.nextToken()
+	p.advance()
 	stmt.Name = &ast.Identifier{
 		Tok:   p.currTok,
 		Value: p.currTok.Literal,
@@ -37,8 +37,8 @@ func (p *Parser) parseLetStatement() ast.Statement {
 		return &ast.Error{Message: fmt.Sprintf(internal.LetErrExpectedAssign, p.peekTok.Type)}
 	}
 
-	p.nextToken() // consume the ASSIGN token
-	p.nextToken() // consume the value token (expression)
+	p.advance() // consume the ASSIGN token
+	p.advance() // consume the value token (expression)
 
 	expr := p.parseExpression(internal.LOWEST)
 
@@ -51,7 +51,7 @@ func (p *Parser) parseLetStatement() ast.Statement {
 	default:
 		stmt.Value = expr
 		for p.currTok.Type != token.SEMICOLON && p.currTok.Type != token.EOF {
-			p.nextToken()
+			p.advance()
 		}
 		if p.currTok.Type == token.EOF {
 			return &ast.Error{Message: fmt.Sprintf(internal.LetErrExpectedSemicolon, token.EOF)}
@@ -63,14 +63,14 @@ func (p *Parser) parseLetStatement() ast.Statement {
 func (p *Parser) parseReturnStatement() ast.Statement {
 	stmt := &ast.Return{Tok: p.currTok}
 
-	p.nextToken() // consume 'return' token
+	p.advance() // consume 'return' token
 
 	// Parse the return value expression
 	stmt.Value = p.parseExpression(internal.LOWEST)
 
 	// Advance until semicolon if present
 	if p.peekTok.Type == token.SEMICOLON {
-		p.nextToken()
+		p.advance()
 	}
 
 	return stmt
@@ -89,7 +89,7 @@ func (p *Parser) parseExpressionStatement() ast.Statement {
 	}
 
 	if p.peekTok.Type == token.SEMICOLON {
-		p.nextToken()
+		p.advance()
 		return stmt
 	}
 

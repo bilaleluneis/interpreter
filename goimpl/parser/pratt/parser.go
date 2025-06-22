@@ -15,18 +15,11 @@ type Parser struct {
 }
 
 func New(l lexer.Lexer) *Parser {
-	p := &Parser{
-		lexer:          l,
-		prefixParseFns: make(map[token.TokenType]PrefixParseFn),
-		infixParseFns:  make(map[token.TokenType]InfixParseFn),
-	}
-
+	p := &Parser{lexer: l}
 	p.initPrefixParseFns()
 	p.initInfixParseFns()
-
 	p.currTok = p.lexer.NextToken()
 	p.peekTok = p.lexer.NextToken()
-
 	return p
 }
 
@@ -39,7 +32,7 @@ func (p *Parser) ParseProgram() ast.Program {
 		case *ast.Error:
 			return ast.Program{Statements: parsedStatements}
 		default:
-			p.nextToken()
+			p.advance()
 		}
 	}
 	return ast.Program{Statements: parsedStatements}

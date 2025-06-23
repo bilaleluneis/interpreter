@@ -24,6 +24,7 @@ rustimpl/rustimpl.iml
 #goimpl ignore list
 goimpl/.idea
 goimpl/goimpl.iml
+goimpl/.github
 
 #monkey ignore list
 monkey-ide/build/
@@ -38,6 +39,3 @@ monkey-ide/gradle.properties
 #root project ignore list
 interpreter.iml
 .idea
-
-goimpl/.github/ai-instructions.md
-goimpl/.github/custom-instructions.md

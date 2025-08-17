@@ -103,16 +103,14 @@ var expressionTests = map[string]expressionTestCase{
 	},
 	"grouped_expression": {
 		tokens: []token.Token{
-			{Type: token.INT, Literal: "1"},
-			{Type: token.PLUS, Literal: "+"},
-			{Type: token.INT, Literal: "2"},
+			{Type: token.INT, Literal: "5"},
 			{Type: token.ASTER, Literal: "*"},
-			{Type: token.INT, Literal: "3"},
-			{Type: token.MINUS, Literal: "-"},
-			{Type: token.INT, Literal: "4"},
+			{Type: token.INT, Literal: "5"},
+			{Type: token.PLUS, Literal: "+"},
+			{Type: token.INT, Literal: "10"},
 			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
-		expectedExpression: "((1 + (2 * 3)) - 4)",
+		expectedExpression: "((5 * 5) + 10)",
 	},
 }

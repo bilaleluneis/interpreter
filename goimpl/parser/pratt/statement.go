@@ -12,11 +12,31 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.currTok.Type {
 	case token.LET:
 		return p.parseLetStatement()
+	case token.LBRACE:
+		return p.parseBlockStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
 		return p.parseExpressionStatement()
 	}
+}
+
+func (p *Parser) parseBlockStatement() ast.Statement {
+	stmt := &ast.Block{Tok: p.currTok, Statements: []ast.Statement{}}
+	p.advance() // consume the LBRACE token
+	for p.currTok.Type != token.RBRACE && p.peekTok.Type != token.EOF {
+		p.advance() // consume the current token
+		if p.currTok.Type == token.EOF {
+			return &ast.Error{Message: fmt.Sprintf(internal.BlockErrExpectedRBrace, token.EOF)}
+		}
+		stmt.Statements = append(stmt.Statements, p.parseStatement())
+	}
+	if p.currTok.Type == token.RBRACE {
+		p.advance() // consume the RBRACE token
+	} else {
+		return &ast.Error{Message: fmt.Sprintf(internal.BlockErrExpectedRBrace, p.peekTok.Type)}
+	}
+	return stmt
 }
 
 // parseLetStatement parses a let statement in the form: let <identifier> = <expression>;

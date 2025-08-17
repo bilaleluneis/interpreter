@@ -8,4 +8,5 @@ const (
 	ErrExpectedPrefixParseFn  = "parse expression: expected prefix parse function for token type %s"
 	ErrExpectedIntegerLiteral = "invalid integer literal: %s"
 	ErrExpectedOpenPren       = "parse expression: expected (, got %s"
+	BlockErrExpectedRBrace    = "parse block: expected }, got %s"
 )

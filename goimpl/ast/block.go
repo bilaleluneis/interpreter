@@ -15,7 +15,7 @@ func (b Block) TokenLiteral() string { return b.Tok.Literal }
 func (b Block) String() string {
 	out := "{"
 	for _, s := range b.Statements {
-		out += s.String() + ";"
+		out += s.String()
 	}
 	return out + "}"
 }
@@ -27,8 +27,7 @@ func (b Block) Dump(ident int) string {
 	out += b.Tok.Literal + " },\n"
 	out += identation + "\tStatements: []ast.Statement{\n"
 	for _, s := range b.Statements {
-		out += s.Dump(ident + 1)
-		out += ";\n"
+		out += s.Dump(ident+1) + "\n"
 	}
 	out += identation + "}\n"
 	out += identation + "} //end of Block"

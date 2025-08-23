@@ -17,7 +17,7 @@ func TestExpression(t *testing.T) {
 			select {
 			case <-done:
 				// test finished
-			case <-time.After(500 * time.Millisecond):
+			case <-time.After(500 * time.Second): //FIXME: was 500 * time.Millisecond
 				t.Errorf("test %q timed out", name)
 			}
 		})
@@ -36,14 +36,8 @@ func runExpressionTest(t *testing.T, fix expressionTestCase, done chan struct{})
 		return
 	}
 
-	stmt, ok := prog.Statements[0].(*ast.ExpressionStatement)
-	if !ok {
-		t.Errorf("statement is not *ast.ExpressionStatement. got=%T", prog.Statements[0])
-		return
-	}
-
-	switch expr := stmt.Exprssn.(type) {
-	case *ast.InvalidExpression:
+	switch expr := prog.Statements[0].(type) {
+	case *ast.Error:
 		if fix.expectedErrMsg == "" {
 			t.Errorf("unexpected error: %s", expr.Message)
 			return

@@ -2,6 +2,7 @@ package ast
 
 type Node interface {
 	String() string
+	// FIXME: remove Dump() and all implementations
 	Dump(ident int) string // Dump returns a string representation of the node object
 	TokenLiteral() string
 }

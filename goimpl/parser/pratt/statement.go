@@ -21,6 +21,7 @@ func (p *Parser) parseStatement() ast.Statement {
 	}
 }
 
+// parses a block statement {}
 func (p *Parser) parseBlockStatement() ast.Statement {
 	stmt := &ast.Block{Tok: p.currTok, Statements: []ast.Statement{}}
 	p.advance() // consume the LBRACE token
@@ -64,7 +65,7 @@ func (p *Parser) parseLetStatement() ast.Statement {
 			Message: fmt.Sprintf(internal.LetErrExpectedExpression, p.currTok.Literal),
 		}
 
-	default:
+	default: // assume this is valid expression
 		stmt.Value = expr
 		for p.currTok.Type != token.SEMICOLON && p.currTok.Type != token.EOF {
 			p.advance()
@@ -92,6 +93,7 @@ func (p *Parser) parseReturnStatement() ast.Statement {
 	return stmt
 }
 
+// NOTE: expressions do not end with a semicolon, but statements do
 func (p *Parser) parseExpressionStatement() ast.Statement {
 	var stmt ast.Statement
 	expr := p.parseExpression(internal.LOWEST)
@@ -101,16 +103,8 @@ func (p *Parser) parseExpressionStatement() ast.Statement {
 		return &ast.Error{Message: expr.Message}
 
 	default: // assume it's a valid expression
-		stmt = &ast.ExpressionStatement{Tok: p.currTok, Exprssn: expr}
+		stmt = &ast.ExpressionStatement{Tok: token.Lookup(expr.TokenLiteral()), Exprssn: expr}
 	}
 
-	if p.peekTok.Type == token.SEMICOLON {
-		p.advance()
-		return stmt
-	}
-
-	return &ast.Error{
-		Message: fmt.Sprintf(internal.LetErrExpectedSemicolon, p.peekTok.Type),
-	}
-
+	return stmt
 }

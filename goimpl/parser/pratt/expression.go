@@ -21,6 +21,7 @@ func (p *Parser) initPrefixParseFns() {
 		token.TRUE:       parseBooleanExpr,
 		token.FALSE:      parseBooleanExpr,
 		token.LPRAN:      parseGroupedExpression,
+		token.FUNCTION:   parseFunctionLiteral,
 	}
 }
 
@@ -37,7 +38,7 @@ func (p *Parser) initInfixParseFns() {
 	}
 }
 
-// parseExpression implements the Pratt parsing algorithm for expressions with operator precedence.
+// parseExpression implements the Pratt parsing for expressions with operator precedence.
 func (p *Parser) parseExpression(precedence internal.Precidence) ast.Expression {
 	prefix := p.prefixParseFns[p.currTok.Type]
 	if prefix == nil {
@@ -129,5 +130,51 @@ var (
 
 		parser.advance() // consume the ')'
 		return expr
+	}
+
+	// parse a function : ex fn(x, y) { return (x + y); }
+	// the block doesnt end up with a semicolon
+	parseFunctionLiteral PrefixParseFn = func(parser *Parser) ast.Expression {
+		fun := &ast.Fun{Tok: parser.currTok}
+		if parser.peekTok.Type != token.LPRAN {
+			return &ast.InvalidExpression{
+				Message: fmt.Sprintf(internal.ErrExpectedOpenPren, parser.peekTok.Type),
+			}
+		}
+		parser.advance() // consume 'fn'
+		parser.advance() // consume '('
+		for parser.currTok.Type == token.IDENTIFIER {
+			fun.Args = append(fun.Args, ast.Identifier{
+				Tok:   parser.currTok,
+				Value: parser.currTok.Literal,
+			})
+			parser.advance() // consume identifier
+			if parser.currTok.Type == token.COMMA {
+				parser.advance() // consume ','
+			} else {
+				break
+			}
+		}
+		if parser.currTok.Type != token.RPRAN {
+			return &ast.InvalidExpression{
+				Message: fmt.Sprintf(internal.ErrExpectedClosePren, parser.peekTok.Type),
+			}
+		}
+		parser.advance() // consume ')'
+		if parser.currTok.Type != token.LBRACE {
+			return &ast.InvalidExpression{
+				Message: fmt.Sprintf(internal.ErrExpectedOpenBrace, parser.peekTok.Type),
+			}
+		}
+		blockStmt := parser.parseBlockStatement()
+		switch funBody := blockStmt.(type) {
+		case *ast.Error:
+			return &ast.InvalidExpression{
+				Message: funBody.Message,
+			}
+		case *ast.Block:
+			fun.Body = *funBody
+		}
+		return fun
 	}
 )

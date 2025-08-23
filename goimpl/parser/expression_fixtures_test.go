@@ -14,7 +14,6 @@ var expressionTests = map[string]expressionTestCase{
 	"identifier": {
 		tokens: []token.Token{
 			{Type: token.IDENTIFIER, Literal: "foobar"},
-			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "foobar",
@@ -22,7 +21,6 @@ var expressionTests = map[string]expressionTestCase{
 	"integer_literal": {
 		tokens: []token.Token{
 			{Type: token.INT, Literal: "5"},
-			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "5",
@@ -30,7 +28,6 @@ var expressionTests = map[string]expressionTestCase{
 	"boolean_true": {
 		tokens: []token.Token{
 			{Type: token.TRUE, Literal: "true"},
-			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "true",
@@ -38,7 +35,6 @@ var expressionTests = map[string]expressionTestCase{
 	"boolean_false": {
 		tokens: []token.Token{
 			{Type: token.FALSE, Literal: "false"},
-			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "false",
@@ -47,7 +43,6 @@ var expressionTests = map[string]expressionTestCase{
 		tokens: []token.Token{
 			{Type: token.BANG, Literal: "!"},
 			{Type: token.INT, Literal: "5"},
-			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "(!5)",
@@ -56,7 +51,6 @@ var expressionTests = map[string]expressionTestCase{
 		tokens: []token.Token{
 			{Type: token.MINUS, Literal: "-"},
 			{Type: token.INT, Literal: "15"},
-			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "(-15)",
@@ -66,7 +60,6 @@ var expressionTests = map[string]expressionTestCase{
 			{Type: token.INT, Literal: "5"},
 			{Type: token.PLUS, Literal: "+"},
 			{Type: token.INT, Literal: "10"},
-			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "(5 + 10)",
@@ -76,7 +69,6 @@ var expressionTests = map[string]expressionTestCase{
 			{Type: token.INT, Literal: "7"},
 			{Type: token.MINUS, Literal: "-"},
 			{Type: token.INT, Literal: "3"},
-			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "(7 - 3)",
@@ -86,7 +78,6 @@ var expressionTests = map[string]expressionTestCase{
 			{Type: token.INT, Literal: "2"},
 			{Type: token.ASTER, Literal: "*"},
 			{Type: token.INT, Literal: "8"},
-			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "(2 * 8)",
@@ -96,7 +87,6 @@ var expressionTests = map[string]expressionTestCase{
 			{Type: token.INT, Literal: "10"},
 			{Type: token.SLASH, Literal: "/"},
 			{Type: token.INT, Literal: "2"},
-			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "(10 / 2)",
@@ -108,9 +98,27 @@ var expressionTests = map[string]expressionTestCase{
 			{Type: token.INT, Literal: "5"},
 			{Type: token.PLUS, Literal: "+"},
 			{Type: token.INT, Literal: "10"},
-			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "((5 * 5) + 10)",
+	},
+	"function_literal": { // TODO: move function parsing to its own tests
+		tokens: []token.Token{
+			{Type: token.FUNCTION, Literal: "fn"},
+			{Type: token.LPRAN, Literal: "("},
+			{Type: token.IDENTIFIER, Literal: "x"},
+			{Type: token.COMMA, Literal: ","},
+			{Type: token.IDENTIFIER, Literal: "y"},
+			{Type: token.RPRAN, Literal: ")"},
+			{Type: token.LBRACE, Literal: "{"},
+			{Type: token.RETURN, Literal: "return"},
+			{Type: token.IDENTIFIER, Literal: "x"},
+			{Type: token.PLUS, Literal: "+"},
+			{Type: token.IDENTIFIER, Literal: "y"},
+			{Type: token.SEMICOLON, Literal: ";"},
+			{Type: token.RBRACE, Literal: "}"},
+			{Type: token.EOF, Literal: ""},
+		},
+		expectedExpression: "fn(x, y) {return (x + y);}",
 	},
 }

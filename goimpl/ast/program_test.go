@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// FIXME: change to use fixtures and rid of Dump()
 func TestProgram(t *testing.T) {
 	program := &Program{
 		Statements: []Statement{

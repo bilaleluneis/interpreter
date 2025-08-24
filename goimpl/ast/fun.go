@@ -23,8 +23,5 @@ func (f Fun) String() string {
 	return "fn(" + strings.Join(args, ", ") + ") " + f.Body.String()
 }
 
-// TODO: implement Dump or remove and rely on String() only?
-func (f Fun) Dump(i int) string { return "Fn Dump not implemented!" }
-
 // implement the expressionNode interface
 func (Fun) expressionNode() {}

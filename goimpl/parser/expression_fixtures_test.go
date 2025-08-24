@@ -2,6 +2,7 @@ package parser
 
 import (
 	"goimpl/token"
+	"strings"
 )
 
 type expressionTestCase struct {
@@ -119,6 +120,8 @@ var expressionTests = map[string]expressionTestCase{
 			{Type: token.RBRACE, Literal: "}"},
 			{Type: token.EOF, Literal: ""},
 		},
-		expectedExpression: "fn(x, y) {return (x + y);}",
+		expectedExpression: strings.ReplaceAll(`fn(x, y) {
+		return (x + y);
+		}`, "\t", ""),
 	},
 }

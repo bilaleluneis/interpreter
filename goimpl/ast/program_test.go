@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// FIXME: change to use fixtures and rid of Dump()
+// FIXME: change to use fixtures
 func TestProgram(t *testing.T) {
 	program := &Program{
 		Statements: []Statement{
@@ -19,7 +19,6 @@ func TestProgram(t *testing.T) {
 		t.Fatalf("program.Statements does not contain 4 statements. got=%d", len(program.Statements))
 	}
 	t.Logf("Program: %s", program)
-	t.Logf("Program Dump: %s", program.Dump(1))
 }
 
 // let myVar = 5;

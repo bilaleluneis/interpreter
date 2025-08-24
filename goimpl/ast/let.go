@@ -2,7 +2,6 @@ package ast
 
 import (
 	"goimpl/token"
-	"strings"
 )
 
 type Let struct {
@@ -20,25 +19,4 @@ func (l Let) String() string {
 		return "let " + l.Name.Value + " = " + l.Value.String() + ";"
 	}
 	return "let <incomplete>"
-}
-
-func (l Let) Dump(ident int) string {
-	out := "ast.Let{ //start of Let\n"
-	indentation := strings.Repeat("\t", ident+1)
-	out += indentation + "Tok: token.Token{Type: token.LET, Literal: \""
-	out += l.Tok.Literal + "\"},\n"
-	out += indentation + "Name: " + func() string {
-		if l.Name != nil {
-			return l.Name.Dump(ident + 1)
-		}
-		return "nil"
-	}() + ",\n"
-	out += indentation + "Value: " + func() string {
-		if l.Value != nil {
-			return l.Value.Dump(ident + 1)
-		}
-		return "nil"
-	}() + "\n"
-	out += strings.Repeat("\t", ident) + "} //end of Let"
-	return out
 }

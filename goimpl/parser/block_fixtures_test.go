@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"goimpl/parser/internal"
 	"goimpl/token"
-	"strings"
 )
 
 type blockTestCase struct {
@@ -27,7 +26,7 @@ var blockTests = map[string]blockTestCase{
 			{Type: token.RBRACE, Literal: "}"},
 			{Type: token.EOF, Literal: ""},
 		},
-		expectedBlock: "{}",
+		expectedBlock: normalize("{}"),
 	},
 	"block_with_return_statement": {
 		tokens: []token.Token{
@@ -38,10 +37,9 @@ var blockTests = map[string]blockTestCase{
 			{Type: token.RBRACE, Literal: "}"},
 			{Type: token.EOF, Literal: ""},
 		},
-		expectedBlock: strings.ReplaceAll(
-			`{
-				return x;
-			}`, "\t", ""),
+		expectedBlock: normalize(`{
+		return x;
+		}`),
 	},
 	"block_with_multiple_statements": {
 		tokens: []token.Token{
@@ -64,10 +62,10 @@ var blockTests = map[string]blockTestCase{
 			{Type: token.RBRACE, Literal: "}"},
 			{Type: token.EOF, Literal: ""},
 		},
-		expectedBlock: strings.ReplaceAll(`{
-		let x = 1;
-		let y = 2;
-		return (x + y);
-		}`, "\t", ""),
+		expectedBlock: normalize(`{
+			let x = 1;
+			let y = 2;
+			return (x + y);
+		}`),
 	},
 }

@@ -17,7 +17,7 @@ func TestExpression(t *testing.T) {
 			select {
 			case <-done:
 				// test finished
-			case <-time.After(500 * time.Second): //FIXME: was 500 * time.Millisecond
+			case <-time.After(500 * time.Microsecond):
 				t.Errorf("test %q timed out", name)
 			}
 		})

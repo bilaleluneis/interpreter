@@ -2,7 +2,6 @@ package parser
 
 import (
 	"goimpl/token"
-	"strings"
 )
 
 type expressionTestCase struct {
@@ -102,26 +101,5 @@ var expressionTests = map[string]expressionTestCase{
 			{Type: token.EOF, Literal: ""},
 		},
 		expectedExpression: "((5 * 5) + 10)",
-	},
-	"function_literal": { // TODO: move function parsing to its own tests
-		tokens: []token.Token{
-			{Type: token.FUNCTION, Literal: "fn"},
-			{Type: token.LPRAN, Literal: "("},
-			{Type: token.IDENTIFIER, Literal: "x"},
-			{Type: token.COMMA, Literal: ","},
-			{Type: token.IDENTIFIER, Literal: "y"},
-			{Type: token.RPRAN, Literal: ")"},
-			{Type: token.LBRACE, Literal: "{"},
-			{Type: token.RETURN, Literal: "return"},
-			{Type: token.IDENTIFIER, Literal: "x"},
-			{Type: token.PLUS, Literal: "+"},
-			{Type: token.IDENTIFIER, Literal: "y"},
-			{Type: token.SEMICOLON, Literal: ";"},
-			{Type: token.RBRACE, Literal: "}"},
-			{Type: token.EOF, Literal: ""},
-		},
-		expectedExpression: strings.ReplaceAll(`fn(x, y) {
-		return (x + y);
-		}`, "\t", ""),
 	},
 }

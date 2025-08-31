@@ -157,13 +157,13 @@ var (
 		}
 		if parser.currTok.Type != token.RPRAN {
 			return &ast.InvalidExpression{
-				Message: fmt.Sprintf(internal.ErrExpectedClosePren, parser.peekTok.Type),
+				Message: fmt.Sprintf(internal.ErrExpectedClosePren, parser.currTok.Type),
 			}
 		}
 		parser.advance() // consume ')'
 		if parser.currTok.Type != token.LBRACE {
 			return &ast.InvalidExpression{
-				Message: fmt.Sprintf(internal.ErrExpectedOpenBrace, parser.peekTok.Type),
+				Message: fmt.Sprintf(internal.ErrExpectedOpenBrace, parser.currTok.Type),
 			}
 		}
 		blockStmt := parser.parseBlockStatement()

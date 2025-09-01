@@ -15,6 +15,12 @@ var whiteSpace = []byte{
 var operators = map[byte]token.TokenType{
 	'=': token.ASSIGN,
 	'+': token.PLUS,
+	'*': token.ASTER,
+	'-': token.MINUS,
+	'/': token.SLASH,
+	'!': token.BANG,
+	'<': token.LT,
+	'>': token.GT,
 }
 
 var seperators = map[byte]token.TokenType{
@@ -26,6 +32,10 @@ var keywords = map[string]token.TokenType{
 	"let":    token.LET,
 	"fn":     token.FUNCTION,
 	"return": token.RETURN,
+	"if":     token.IF,
+	"else":   token.ELSE,
+	"true":   token.TRUE,
+	"false":  token.FALSE,
 }
 
 var blocksAndSubscripts = map[byte]token.TokenType{

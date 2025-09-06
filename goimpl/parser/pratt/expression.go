@@ -22,6 +22,7 @@ func (p *Parser) initPrefixParseFns() {
 		token.FALSE:      parseBooleanExpr,
 		token.LPRAN:      parseGroupedExpression,
 		token.FUNCTION:   parseFunctionLiteral,
+		token.IF:         parseIfExpression,
 	}
 }
 

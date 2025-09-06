@@ -8,22 +8,22 @@ import (
 	"time"
 )
 
-func TestFun(t *testing.T) {
-	for name, fix := range funTests {
+func TestIf(t *testing.T) {
+	for name, fix := range ifTests {
 		t.Run(name, func(t *testing.T) {
 			done := make(chan struct{})
-			go runFunTest(t, fix, done)
+			go runIfTest(t, fix, done)
 			select {
 			case <-done:
 				// test finished
-			case <-time.After(500 * time.Millisecond):
+			case <-time.After(500 * time.Second):
 				t.Errorf("test %q timed out", name)
 			}
 		})
 	}
 }
 
-func runFunTest(t *testing.T, fix funTestCase, done chan struct{}) {
+func runIfTest(t *testing.T, fix ifTestCase, done chan struct{}) {
 	defer close(done)
 
 	lex := lexer.NewStubLexer(fix.tokens)
@@ -35,24 +35,24 @@ func runFunTest(t *testing.T, fix funTestCase, done chan struct{}) {
 		return
 	}
 
-	switch fun := prog.Statements[0].(type) {
+	switch ifExpr := prog.Statements[0].(type) {
 	case *ast.Error:
 		if fix.expectedErrMsg == "" {
-			t.Errorf("unexpected error: %s", fun.Message)
+			t.Errorf("unexpected error: %s", ifExpr.Message)
 			return
 		}
-		if fun.Message != fix.expectedErrMsg {
-			t.Errorf("wrong error message. got=%q, want=%q", fun.Message, fix.expectedErrMsg)
+		if ifExpr.Message != fix.expectedErrMsg {
+			t.Errorf("wrong error message. got=%q, want=%q", ifExpr.Message, fix.expectedErrMsg)
 		}
 	default:
-		if fix.expectedFunExpression == "" {
-			t.Error("expected error but got valid function")
+		if fix.expectedIfExpression == "" {
+			t.Error("expected error but got valid if expression")
 			return
 		}
-		got := fun.String()
-		want := fix.expectedFunExpression
+		got := ifExpr.String()
+		want := fix.expectedIfExpression
 		if got != want {
-			t.Errorf("wrong function string. got=%q, want=%q", got, want)
+			t.Errorf("wrong if expression string. got=%q, want=%q", got, want)
 		}
 	}
 }

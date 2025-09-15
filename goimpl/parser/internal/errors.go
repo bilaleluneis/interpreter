@@ -14,4 +14,5 @@ const (
 	ErrExpectedOpenBrace      = "parse block: expected {, got %s"
 	BlockErrExpectedRBrace    = "parse block: expected }, got %s"
 	ErrExpectedExpression     = "parser expected expression, got %s"
+	ErrEmptyExpression        = "parser got empty expression"
 )

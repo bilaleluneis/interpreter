@@ -13,20 +13,6 @@ type ifTestCase struct {
 }
 
 var ifTests = map[string]ifTestCase{
-	"simple_if": {
-		tokens: []token.Token{
-			{Type: token.IF, Literal: "if"},
-			{Type: token.LPRAN, Literal: "("},
-			{Type: token.TRUE, Literal: "true"},
-			{Type: token.RPRAN, Literal: ")"},
-			{Type: token.LBRACE, Literal: "{"},
-			{Type: token.IDENTIFIER, Literal: "x"},
-			{Type: token.SEMICOLON, Literal: ";"},
-			{Type: token.RBRACE, Literal: "}"},
-			{Type: token.EOF, Literal: ""},
-		},
-		expectedIfExpression: normalize(`if (true) { x; }`),
-	},
 	"empty_expression_in_condition": {
 		tokens: []token.Token{
 			{Type: token.IF, Literal: "if"},
@@ -38,7 +24,7 @@ var ifTests = map[string]ifTestCase{
 			{Type: token.RBRACE, Literal: "}"},
 			{Type: token.EOF, Literal: ""},
 		},
-		expectedErrMsg: fmt.Sprintf(internal.ErrExpectedExpression, token.RPRAN),
+		expectedErrMsg: internal.ErrEmptyExpression,
 	},
 	"missing_opening_parenthesis": {
 		tokens: []token.Token{
@@ -46,11 +32,30 @@ var ifTests = map[string]ifTestCase{
 			{Type: token.TRUE, Literal: "true"},
 			{Type: token.RPRAN, Literal: ")"},
 			{Type: token.LBRACE, Literal: "{"},
+			{Type: token.RBRACE, Literal: "}"},
+			{Type: token.EOF, Literal: ""},
+		},
+		expectedErrMsg: fmt.Sprintf(internal.ErrExpectedOpenPren, token.TRUE),
+	},
+	// TODO: need to unifiy statement formmating and spacing rules
+	// otherwise tests will be hard to maintain
+	// as we have to match exact string representation
+	// with spacing and tabs , etc !!!
+	"simple_if_statement": {
+		tokens: []token.Token{
+			{Type: token.IF, Literal: "if"},
+			{Type: token.LPRAN, Literal: "("},
+			{Type: token.TRUE, Literal: "true"},
+			{Type: token.RPRAN, Literal: ")"},
+			{Type: token.LBRACE, Literal: "{"},
+			{Type: token.RETURN, Literal: "return"},
 			{Type: token.IDENTIFIER, Literal: "x"},
 			{Type: token.SEMICOLON, Literal: ";"},
 			{Type: token.RBRACE, Literal: "}"},
 			{Type: token.EOF, Literal: ""},
 		},
-		expectedErrMsg: fmt.Sprintf(internal.ErrExpectedOpenPren, token.TRUE),
+		expectedIfExpression: normalize(`if(true){
+			return x;
+			}`),
 	},
 }

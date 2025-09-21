@@ -10,64 +10,50 @@ import (
 // parseIfExpression parses an if expression.
 // if(<condition>) { <consequence> } else { <alternative> }
 // TODO: need to handle else part
-// TODO: need to clean up code and reduce size ..
-// have parser return something like (ast.Expression, error) instead of
 var parseIfExpression PrefixParseFn = func(parser *Parser) ast.Expression {
-	ifExpr := &ast.IfExpression{
-		Tok: token.Lookup("if"),
-	}
 
+	ifExpr := &ast.IfExpression{Tok: token.Lookup("if")}
+	err := &ast.InvalidExpression{Tok: ifExpr.Tok}
 	parser.advance() // consume 'if'
 
+	// Validate '(' and non-empty condition
 	if parser.currTok.Type != token.LPRAN {
-		return &ast.InvalidExpression{
-			Tok:     token.Lookup("if"),
-			Message: fmt.Sprintf(internal.ErrExpectedOpenPren, parser.currTok.Type),
-		}
+		err.Message = fmt.Sprintf(internal.ErrExpectedOpenPren, parser.currTok.Type)
+		return err
 	}
-
 	if parser.peekTok.Type == token.RPRAN {
-		return &ast.InvalidExpression{
-			Tok:     token.Lookup("if"),
-			Message: internal.ErrEmptyExpression,
-		}
+		err.Message = internal.ErrEmptyExpression
+		return err
 	}
 
-	condition := parser.parseExpression(internal.LOWEST)
-	switch cond := condition.(type) {
-	case *ast.InvalidExpression:
-		cond.Tok = token.Lookup("if") //TODO: revisit InvalidExpression Tok usage
-		return cond
-	default:
-		ifExpr.Condition = cond
+	// Parse condition
+	cond := parser.parseExpression(internal.LOWEST)
+	if invalid, ok := cond.(*ast.InvalidExpression); ok {
+		invalid.Tok = ifExpr.Tok
+		return invalid
 	}
+	ifExpr.Condition = cond
 
+	// Validate ')'
 	if parser.currTok.Type != token.RPRAN {
-		return &ast.InvalidExpression{
-			Tok:     token.Lookup("if"),
-			Message: fmt.Sprintf(internal.ErrExpectedClosePren, parser.currTok.Type),
-		}
+		err.Message = fmt.Sprintf(internal.ErrExpectedClosePren, parser.currTok.Type)
+		return err
 	}
-
 	parser.advance() // consume ')'
 
+	// Validate '{'
 	if parser.currTok.Type != token.LBRACE {
-		return &ast.InvalidExpression{
-			Tok:     token.Lookup("if"),
-			Message: fmt.Sprintf(internal.ErrExpectedOpenBrace, parser.currTok.Type),
-		}
+		err.Message = fmt.Sprintf(internal.ErrExpectedOpenBrace, parser.currTok.Type)
+		return err
 	}
 
-	consequence := parser.parseBlockStatement()
-	switch cons := consequence.(type) {
-	case *ast.Block:
-		ifExpr.Conseq = *cons
-	default:
-		return &ast.InvalidExpression{
-			Tok:     token.Lookup("if"),
-			Message: "Expected block statement as consequence",
-		}
+	// Parse consequence block
+	cons := parser.parseBlockStatement()
+	if block, ok := cons.(*ast.Block); ok {
+		ifExpr.Conseq = *block
+		return ifExpr
 	}
 
-	return ifExpr
+	err.Message = "Expected block statement as consequence"
+	return err
 }

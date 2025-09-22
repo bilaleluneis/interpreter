@@ -1,41 +1,19 @@
 
-#kotlinimpl ignore list
-kotlinimpl/.idea
-kotlinimpl/kotlinimpl.iml
-
-#pyimpl ignore list
-pyimpl/pyimpl.iml
-/pyimpl/src/pyimpl.egg-info/
-pyimpl/.vscode/settings.json
-pyimpl/src/pyimpl/__pycache__/__init__.cpython-313.pyc
-pyimpl/src/pyimpl/lexer/__pycache__/__init__.cpython-313.pyc
-pyimpl/src/pyimpl/lexer/__pycache__/lexer.cpython-313.pyc
-pyimpl/src/pyimpl/token/__pycache__/__init__.cpython-313.pyc
-pyimpl/src/pyimpl/token/__pycache__/token.cpython-313.pyc
-pyimpl/src/pyimpl/token/__pycache__/tokentype.cpython-313.pyc
-pyimpl/tests/__pycache__/lexer_test.cpython-313-pytest-8.3.3.pyc
-pyimpl/tests/__pycache__/tokentype_test.cpython-313-pytest-8.3.3.pyc
-__pycache__/
-
-#rustimpl ignore list
-rustimpl/target
-rustimpl/rustimpl.iml
-
-#goimpl ignore list
-goimpl/.idea
-goimpl/goimpl.iml
-goimpl/.github
-
-#monkey ignore list
-monkey-ide/build/
-monkey-ide/.build/
-monkey-ide/gradle/
-monkey-ide/.gradle/
-monkey-ide/.run
-monkey-ide/gradlew
-monkey-ide/gradlew.bat
-monkey-ide/gradle.properties
-
-#root project ignore list
+#project ignore list
 interpreter.iml
+build
 .idea
+.iml
+.bloop
+.gradle
+.DS_Store
+.run
+.metals
+target
+__pycache__
+.vscode
+*.egg-info
+.gradlew
+.gradlew.bat
+gradle.properties
+

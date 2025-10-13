@@ -1,6 +1,8 @@
 package com.monkeylang.parser
+
 import com.monkeylang.lexer.{Lexer, MockLexer, Token}
-import com.monkeylang.ast.{Statement, Expression}
+import com.monkeylang.ast.Statement.Return
+import com.monkeylang.ast.Expression.BooleanLiteral
 import scala.collection.immutable.ArraySeq
 
 final class ReturnParserSuite extends munit.FunSuite:
@@ -12,6 +14,6 @@ final class ReturnParserSuite extends munit.FunSuite:
     )
 
     val (ast, _) = returnParser(lexer)
-    val expected = Statement.Return(Expression.BooleanLiteral("true"))
+    val expected = Return(Some(BooleanLiteral("true")))
 
     assertEquals(ast, expected)

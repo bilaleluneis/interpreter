@@ -1,7 +1,7 @@
 package com.monkeylang.parser
 
 import com.monkeylang.lexer.Lexer
-import com.monkeylang.ast.{Statement, Expression}
+import com.monkeylang.ast.{Statement, Expression, Error}
 
-enum ParserType(val parser: (Lexer) -> (Statement | Expression, Lexer)):
-  case ReturnParserType extends ParserType(returnParser)
+enum Parser(val parser: Lexer -> (Statement | Expression | Error, Lexer)):
+  case ReturnParser extends Parser(returnParser)

@@ -20,7 +20,6 @@
     <maven.compiler.target>17</maven.compiler.target>
     <encoding>UTF-8</encoding>
     <scala.version>3.7.3</scala.version>
-    <scala.compiler.options>-language:experimental.pureFunctions</scala.compiler.options>
   </properties>
 
   <dependencies>
@@ -51,7 +50,8 @@
         <configuration>
           <scalaVersion>${scala.version}</scalaVersion>
           <args>
-            <arg>${scala.compiler.options}</arg>
+            <arg>-language:experimental.pureFunctions</arg>
+            <!-- <arg>-language:strictEquality</arg> -->
           </args>
         </configuration>
         <executions>
@@ -62,7 +62,8 @@
             </goals>
             <configuration>
               <args>
-                <arg>${scala.compiler.options}</arg>
+                <arg>-language:experimental.pureFunctions</arg>
+                <!-- <arg>-language:strictEquality</arg> -->
               </args>
             </configuration>
           </execution>

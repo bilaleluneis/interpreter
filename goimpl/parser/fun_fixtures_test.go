@@ -59,7 +59,6 @@ var funTests = map[string]funTestCase{
 		return (x + y);
 		}`),
 	},
-	// FIXME: fix test bellow
 	"function_missing_rparen": {
 		tokens: []token.Token{
 			{Type: token.FUNCTION, Literal: "fn"},

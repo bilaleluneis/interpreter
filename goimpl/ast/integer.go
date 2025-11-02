@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"fmt"
 	"goimpl/token"
 )
 
@@ -13,4 +14,4 @@ func (IntegerLiteral) expressionNode() {}
 
 func (il IntegerLiteral) TokenLiteral() string { return il.Tok.Literal }
 
-func (il IntegerLiteral) String() string { return il.Tok.Literal }
+func (il IntegerLiteral) String() string { return fmt.Sprintf("%d", il.Value) }

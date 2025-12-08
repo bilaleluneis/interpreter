@@ -1,7 +1,7 @@
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum Token {
     Illegal(String),
     Ident(String),
@@ -41,6 +41,13 @@ impl Token {
         }
     }
 }
+
+// impl fmt::Debug for Token {
+//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//         // Use Display implementation for Debug output
+//         write!(f, "DUH{}", self)
+//     }
+// }
 
 impl Display for Token {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
@@ -93,7 +100,7 @@ mod tests {
             assert_eq!(Token::lookup(input), expected);
         }
     }
-    
+
     #[test]
     fn token_display() {
         let tokens = [
@@ -119,5 +126,4 @@ mod tests {
             assert_eq!(input.to_string(), expected);
         }
     }
-    
 }

@@ -1,43 +1,41 @@
 use scanner::lexer::Lexer;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub struct CombinatorParser<L: Lexer> {
     lexer: L,
 }
 
-impl<L: Lexer> FnOnce<()> for CombinatorParser<L> {
-    type Output = CombinatorParser<L>;
+impl<L: Lexer> CombinatorParser<L> {
+    pub fn new(lexer: L) -> Self {
+        CombinatorParser { lexer }
+    }
 
-    extern "rust-call" fn call_once(self, _: ()) -> Self::Output {
-        self
+    // Example: a method to parse something
+    pub fn parse(&mut self) {
+        // Implement your parsing logic here
     }
 }
 
-impl<L: Lexer> FnMut<()> for CombinatorParser<L> {
-    extern "rust-call" fn call_mut(&mut self, _: ()) -> Self::Output {
-        *self
-    }
+// Example of a combinator function
+pub fn map<L, F>(mut parser: CombinatorParser<L>, f: F) -> CombinatorParser<L>
+where
+    L: Lexer,
+    F: Fn(&mut CombinatorParser<L>),
+{
+    f(&mut parser);
+    parser
 }
-
-impl<L: Lexer> Fn<()> for CombinatorParser<L> {
-    extern "rust-call" fn call(&self, _: ()) -> Self::Output {
-        *self
-    }
-}
-
-pub type CombinatorParserFn<L> = fn(L) -> CombinatorParser<L>;
 
 #[cfg(test)]
 mod tests {
+    use crate::combinator::{CombinatorParser, map};
     use scanner::lazy::LazyLexer;
-
-    use crate::combinator::CombinatorParser;
 
     #[test]
     fn test_combinator_parser() {
         let lexer = LazyLexer::new("=+,;(){}");
-        let parser = CombinatorParser { lexer };
-        let _ = parser();
+        let mut parser = CombinatorParser::new(lexer);
+        parser.parse();
+        let _ = map(parser, |p| p.parse());
     }
 }
-

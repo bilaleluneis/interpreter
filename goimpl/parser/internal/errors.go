@@ -1,7 +1,8 @@
 package internal
 
 const (
-	// FIXME: make errors reusalbe and not specific to one statment like let
+	// LetErrExpectedIdentifier
+	//FIXME: make errors reusalbe and not specific to one statment like let
 	// example: ErrExpectedExpression can be used in if, let, return, etc
 	LetErrExpectedIdentifier  = "parse let: expected IDENTIFIER, got %s"
 	LetErrExpectedAssign      = "parse let: expected ASSIGN, got %s"

@@ -1,5 +1,7 @@
 package lexer
 
+import "strings"
+
 import "goimpl/token"
 
 type LazyLexer struct {
@@ -29,23 +31,24 @@ func (l *LazyLexer) NextToken() token.Token {
 	}
 
 	l.charUnderInspection = l.peek()
+	inspectedChar := l.charUnderInspection
+	tokenToReturn := token.NewToken(token.ILLIGAL, inspectedChar)
 
-	tokenToReturn := token.NewToken(token.ILLIGAL, l.charUnderInspection)
-	if isEof(l.charUnderInspection) {
+	if isEof(inspectedChar) {
 		tokenToReturn = token.Token{Type: token.EOF, Literal: ""}
-	} else if isOperator(l.charUnderInspection) {
-		tokenToReturn = token.NewToken(operators[l.charUnderInspection], l.charUnderInspection)
+	} else if isOperator(inspectedChar) {
+		tokenToReturn = token.NewToken(operators[inspectedChar], inspectedChar)
 		l.advanceLoc()
-	} else if isSeperator(l.charUnderInspection) {
-		tokenToReturn = token.NewToken(seperators[l.charUnderInspection], l.charUnderInspection)
+	} else if isSeperator(inspectedChar) {
+		tokenToReturn = token.NewToken(seperators[inspectedChar], inspectedChar)
 		l.advanceLoc()
-	} else if isBlockOrSubscript(l.charUnderInspection) {
-		tokenToReturn = token.NewToken(blocksAndSubscripts[l.charUnderInspection], l.charUnderInspection)
+	} else if isBlockOrSubscript(inspectedChar) {
+		tokenToReturn = token.NewToken(blocksAndSubscripts[inspectedChar], inspectedChar)
 		l.advanceLoc()
-	} else if isDigit(l.charUnderInspection) {
+	} else if isDigit(inspectedChar) {
 		digits := l.captureDigits()
 		tokenToReturn = token.Token{Type: token.INT, Literal: digits}
-	} else if isLetter(l.charUnderInspection) {
+	} else if isLetter(inspectedChar) {
 		//capture the litral string
 		litral := l.captureLiteral()
 
@@ -74,21 +77,21 @@ func (l *LazyLexer) peek() byte {
 }
 
 func (l *LazyLexer) captureLiteral() string {
-	var litral string
+	var litral strings.Builder
 	for ; !isWhiteSpace(l.peek()) && isLetter(l.peek()); l.advanceLoc() {
 		letter := l.peek()
 		l.charUnderInspection = letter
-		litral += string(l.charUnderInspection)
+		litral.WriteString(string(l.charUnderInspection))
 	}
-	return litral
+	return litral.String()
 }
 
 func (l *LazyLexer) captureDigits() string {
-	var digits string
+	var digits strings.Builder
 	for ; !isWhiteSpace(l.peek()) && isDigit(l.peek()); l.advanceLoc() {
 		digit := l.peek()
 		l.charUnderInspection = digit
-		digits += string(l.charUnderInspection)
+		digits.WriteString(string(l.charUnderInspection))
 	}
-	return digits
+	return digits.String()
 }

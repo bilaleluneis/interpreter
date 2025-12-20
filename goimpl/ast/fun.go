@@ -5,14 +5,14 @@ import (
 	"strings"
 )
 
-// Function expression type fn(x, y) { ... }
+// Fun Function expression type fn(x, y) { ... }
 type Fun struct {
 	Tok  token.Token  // fn keyword token
 	Args []Identifier // function arguments (x, y,...)
 	Body Block        // {...} function body
 }
 
-// implement the Node interface
+// TokenLiteral implement the Node interface
 func (f Fun) TokenLiteral() string { return "fn" }
 
 func (f Fun) String() string {

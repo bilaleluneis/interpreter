@@ -2,6 +2,7 @@ package ast
 
 import (
 	"goimpl/token"
+	"strings"
 )
 
 type Block struct {
@@ -9,15 +10,16 @@ type Block struct {
 	Statements []Statement
 }
 
-func (Block) statmentNode()          {}
+func (Block) statementNode()         {}
 func (b Block) TokenLiteral() string { return b.Tok.Literal }
 func (b Block) String() string {
-	out := "{"
+	var out strings.Builder
+	out.WriteString("{")
 	if len(b.Statements) > 0 {
-		out += "\n"
+		out.WriteString("\n")
 	}
 	for _, s := range b.Statements {
-		out += s.String() + "\n"
+		out.WriteString(s.String() + "\n")
 	}
-	return out + "}"
+	return out.String() + "}"
 }

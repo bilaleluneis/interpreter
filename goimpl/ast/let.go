@@ -10,7 +10,7 @@ type Let struct {
 	Value Expression
 }
 
-func (Let) statmentNode() {}
+func (Let) statementNode() {}
 
 func (l Let) TokenLiteral() string { return l.Tok.Literal }
 

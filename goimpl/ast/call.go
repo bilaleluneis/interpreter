@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Call: represents a function call expression.
+// Call Call: represents a function call expression.
 // <expression>(<comma separated expression list>)
 // Examples:
 //
@@ -31,9 +31,9 @@ func (c Call) String() string {
 	return c.Function.String() + "(" + joinExpressions(args) + ")"
 }
 
-func joinExpressions(exprs []string) string {
+func joinExpressions(e []string) string {
 	var b strings.Builder
-	for i, expr := range exprs {
+	for i, expr := range e {
 		if i > 0 {
 			b.WriteString(", ")
 		}

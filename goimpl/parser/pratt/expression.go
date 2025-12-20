@@ -134,7 +134,7 @@ var (
 	}
 
 	// parse a function : ex fn(x, y) { return (x + y); }
-	// the block doesnt end up with a semicolon
+	// the block doesn't end up with a semicolon
 	parseFunctionLiteral PrefixParseFn = func(parser *Parser) ast.Expression {
 		fun := &ast.Fun{Tok: parser.currTok}
 		if parser.peekTok.Type != token.LPRAN {

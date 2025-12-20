@@ -4,7 +4,7 @@ type Error struct {
 	Message string
 }
 
-func (Error) statmentNode()          {}
+func (Error) statementNode()         {}
 func (e Error) TokenLiteral() string { return e.Message }
 func (e Error) String() string {
 	if e.Message != "" {

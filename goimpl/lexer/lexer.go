@@ -10,7 +10,7 @@ type Lexer interface {
 	NextToken() token.Token
 }
 
-type LexerConstraint[T any] interface {
+type Constraint[T any] interface {
 	Lexer
 }
 

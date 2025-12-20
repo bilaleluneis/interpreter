@@ -9,7 +9,7 @@ type ExpressionStatement struct {
 	Exprssn Expression
 }
 
-func (ExpressionStatement) statmentNode() {}
+func (ExpressionStatement) statementNode() {}
 
 func (e ExpressionStatement) TokenLiteral() string {
 	return e.Tok.Literal

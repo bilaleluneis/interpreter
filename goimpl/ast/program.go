@@ -1,5 +1,7 @@
 package ast
 
+import "strings"
+
 // Program is the top most node that will contain child statments
 type Program struct {
 	Statements []Statement
@@ -13,12 +15,13 @@ func (p *Program) TokenLiteral() string {
 }
 
 func (p *Program) String() string {
-	out := "\n---- Program Start ----\n"
+	var out strings.Builder
+	out.WriteString("\n---- Program Start ----\n")
 	for _, s := range p.Statements {
-		out += "\n"
-		out += s.String()
-		out += "\n"
+		out.WriteString("\n")
+		out.WriteString(s.String())
+		out.WriteString("\n")
 	}
-	out += "\n---- Program End ----\n"
-	return out
+	out.WriteString("\n---- Program End ----\n")
+	return out.String()
 }

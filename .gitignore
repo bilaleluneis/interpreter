@@ -16,4 +16,4 @@ __pycache__
 .gradlew
 .gradlew.bat
 gradle.properties
-goimpl/.github/instructions/gopls.instructions.md
+goimpl/.github

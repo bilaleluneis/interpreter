@@ -102,4 +102,16 @@ var expressionTests = map[string]expressionTestCase{
 		},
 		expectedExpression: "((5 * 5) + 10)",
 	},
+	"call_expression": {
+		tokens: []token.Token{
+			{Type: token.IDENTIFIER, Literal: "add"},
+			{Type: token.LPRAN, Literal: "("},
+			{Type: token.INT, Literal: "1"},
+			{Type: token.COMMA, Literal: ","},
+			{Type: token.INT, Literal: "2"},
+			{Type: token.RPRAN, Literal: ")"},
+			{Type: token.EOF, Literal: ""},
+		},
+		expectedExpression: "add(1, 2)",
+	},
 }

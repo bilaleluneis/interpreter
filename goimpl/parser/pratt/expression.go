@@ -36,6 +36,7 @@ func (p *Parser) initInfixParseFns() {
 		token.NEQ:   parseInfixExpr,
 		token.LT:    parseInfixExpr,
 		token.GT:    parseInfixExpr,
+		token.LPRAN: parseCallExpression,
 	}
 }
 
@@ -75,6 +76,38 @@ var (
 		parser.advance()
 		expr.Right = parser.parseExpression(precedence)
 		return expr
+	}
+
+	// parseCallExpression handles function calls like add(1, 2)
+	parseCallExpression InfixParseFn = func(parser *Parser, left ast.Expression) ast.Expression {
+		call := &ast.Call{Tok: parser.currTok, Function: left}
+
+		// consume '('
+		parser.advance()
+
+		// no arguments: ()
+		if parser.currTok.Type == token.RPRAN {
+			return call
+		}
+
+		// at least one argument
+		call.Args = append(call.Args, parser.parseExpression(internal.LOWEST))
+
+		// additional comma-separated args
+		for parser.peekTok.Type == token.COMMA {
+			parser.advance() // consume current token (last arg)
+			parser.advance() // move to next token (start of next arg)
+			call.Args = append(call.Args, parser.parseExpression(internal.LOWEST))
+		}
+
+		// expect closing ')'
+		if parser.peekTok.Type != token.RPRAN {
+			return &ast.InvalidExpression{
+				Message: fmt.Sprintf(internal.ErrExpectedClosePren, parser.peekTok.Type),
+			}
+		}
+		parser.advance() // consume ')'
+		return call
 	}
 
 	// parseIdentifierExpr handles variable names and other identifiers.

@@ -40,4 +40,7 @@ var PrecidenceMap = map[token.TokenType]Precidence{
 	token.MINUS: SUM,
 	token.SLASH: PRODUCT,
 	token.ASTER: PRODUCT,
+
+	// Call (function calls)
+	token.LPRAN: CALL,
 }

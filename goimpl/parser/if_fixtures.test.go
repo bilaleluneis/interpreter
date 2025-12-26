@@ -58,4 +58,29 @@ var ifTests = map[string]ifTestCase{
 			return x;
 			}`),
 	},
+	"if_with_else": {
+		tokens: []token.Token{
+			{Type: token.IF, Literal: "if"},
+			{Type: token.LPRAN, Literal: "("},
+			{Type: token.TRUE, Literal: "true"},
+			{Type: token.RPRAN, Literal: ")"},
+			{Type: token.LBRACE, Literal: "{"},
+			{Type: token.RETURN, Literal: "return"},
+			{Type: token.IDENTIFIER, Literal: "x"},
+			{Type: token.SEMICOLON, Literal: ";"},
+			{Type: token.RBRACE, Literal: "}"},
+			{Type: token.ELSE, Literal: "else"},
+			{Type: token.LBRACE, Literal: "{"},
+			{Type: token.RETURN, Literal: "return"},
+			{Type: token.IDENTIFIER, Literal: "y"},
+			{Type: token.SEMICOLON, Literal: ";"},
+			{Type: token.RBRACE, Literal: "}"},
+			{Type: token.EOF, Literal: ""},
+		},
+		expectedIfExpression: normalize(`if(true){
+				return x;
+				} else {
+				return y;
+				}`),
+	},
 }

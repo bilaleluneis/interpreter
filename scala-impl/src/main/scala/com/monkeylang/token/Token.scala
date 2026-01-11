@@ -1,4 +1,4 @@
-package com.monkeylang.lexer
+package com.monkeylang.token
 
 enum Token:
   case EOF
@@ -29,7 +29,7 @@ enum Token:
   case TRUE
   case FALSE
 
-  override def toString(): String =
+  override def toString: String =
     this match
       case EOF          => "EOF"
       case ILLEGAL      => "ILLEGAL"

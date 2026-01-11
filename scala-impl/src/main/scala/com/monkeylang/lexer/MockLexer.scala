@@ -1,6 +1,7 @@
 package com.monkeylang.lexer
 
 import scala.collection.immutable.ArraySeq
+import com.monkeylang.token.Token
 
 final class MockLexer(toks: ArraySeq[Token]) extends Lexer, Iterable[Token]:
   override def iterator: Iterator[Token] =

@@ -1,6 +1,7 @@
 package com.monkeylang.parser
 
-import com.monkeylang.lexer.{Lexer, MockLexer, Token}
+import com.monkeylang.lexer.{Lexer, MockLexer}
+import com.monkeylang.token.Token
 import com.monkeylang.ast.Statement.Return
 import com.monkeylang.ast.Expression.BooleanLiteral
 import scala.collection.immutable.ArraySeq

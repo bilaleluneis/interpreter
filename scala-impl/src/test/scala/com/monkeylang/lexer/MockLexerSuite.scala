@@ -2,6 +2,7 @@ package com.monkeylang.lexer
 
 import munit.FunSuite
 import scala.collection.immutable.ArraySeq
+import com.monkeylang.token.Token
 
 final class MockLexerSuite extends FunSuite:
 

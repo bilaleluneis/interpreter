@@ -11,7 +11,7 @@ final class TokensSuite extends munit.FunSuite:
   )
 
   test("Tokens toString"):
-    assertEquals(tokens.toString, "[LET IDENT(myVar) ASSIGN INT(5) SEMICOLON]")
+    assertEquals(tokens.toString, "[LET IDENT(myVar) = INT(5) ;]")
 
   test("Tokens iteration"):
     val it = tokens.iterator

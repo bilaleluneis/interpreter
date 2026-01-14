@@ -54,6 +54,7 @@
           <scalaVersion>${scala.version}</scalaVersion>
           <args>
             <arg>-language:experimental.pureFunctions</arg>
+            <arg>-Yexplicit-nulls</arg>
             <!-- <arg>-language:strictEquality</arg> -->
           </args>
         </configuration>
@@ -66,6 +67,7 @@
             <configuration>
               <args>
                 <arg>-language:experimental.pureFunctions</arg>
+                <arg>-Yexplicit-nulls</arg>
                 <!-- <arg>-language:strictEquality</arg> -->
               </args>
             </configuration>

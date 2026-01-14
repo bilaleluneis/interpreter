@@ -2,10 +2,17 @@ package com.monkeylang.ast
 
 sealed trait AstNode
 
-final case class Error(msg: String) extends AstNode
+trait ExpressionNode extends AstNode
+trait StatementNode extends AstNode
+trait ErrorNode extends AstNode
 
-enum Expression extends AstNode:
-  case BooleanLiteral(value: "true" | "false")
+enum AstNodeType:
+  case ErrorType(err: ErrorNode)
+  case ExpressionType(expr: ExpressionNode)
+  case StatementType(stmt: StatementNode)
 
-enum Statement extends AstNode:
-  case Return(value: Option[Expression])
+  override def toString: String =
+    this match
+      case ErrorType(err)       => s"ErrorType($err)"
+      case ExpressionType(expr) => s"ExpressionType($expr)"
+      case StatementType(stmt)  => s"StatementType($stmt)"

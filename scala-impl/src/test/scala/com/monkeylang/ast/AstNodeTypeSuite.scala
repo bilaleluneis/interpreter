@@ -1,6 +1,6 @@
 package com.monkeylang.ast
 
-import com.monkeylang.ast.AstNodeType.ExpressionType
+import com.monkeylang.ast.AstNodeKind.EXPRESSION
 import com.monkeylang.ast.fixtures.types.IntType
 import com.monkeylang.ast.fixtures.types.ComplexAst
 import com.monkeylang.ast.fixtures.types.DummyError
@@ -8,20 +8,20 @@ import com.monkeylang.ast.fixtures.types.DummyError
 final class AstNodeTypeSuite extends munit.FunSuite:
 
   test("switch over AstNode"):
-    val exprNode: AstType = ExpressionType(Identifier("myVar"))
+    val exprNode: AstType = EXPRESSION(Identifier("myVar"))
 
     exprNode match
-      case ExpressionType(expr) =>
+      case EXPRESSION(expr) =>
         assertEquals(expr.toString, "ast.Identifier(myVar)")
       case _ =>
         fail("Expected ExpressionType but got different AstNodeType")
 
   test("AstNodeType should have correc for identfier expression"):
-    val identifier = ExpressionType(Identifier("x"))
+    val identifier = EXPRESSION(Identifier("x"))
     assertEquals(identifier.toString, "ExpressionType(ast.Identifier(x))")
 
   test("AstNodeType should have correct for integer expression"):
-    val intExpr = ExpressionType(IntType(10))
+    val intExpr = EXPRESSION(IntType(10))
     assertEquals(intExpr.toString, "ExpressionType(ast.IntType(10))")
 
   test("able stringify ComplexAst node"):

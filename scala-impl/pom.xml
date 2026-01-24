@@ -5,8 +5,9 @@
   <groupId>com.monkylang</groupId>
   <artifactId>scala-impl</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
   <name>scala-impl</name>
-  <description>MonkeyLang implementation in Scala.</description>
+  <description>MonkeyLang implementation in Scala (multi-module parent).</description>
   <licenses>
     <license>
       <name>MIT</name>
@@ -14,6 +15,13 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+  <modules>
+    <module>ast</module>
+    <module>lexer</module>
+    <module>parser</module>
+    <module>token</module>
+  </modules>
 
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
@@ -42,51 +50,5 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <sourceDirectory>src/main/scala</sourceDirectory>
-    <testSourceDirectory>src/test/scala</testSourceDirectory>
-    <plugins>
-      <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>scala-maven-plugin</artifactId>
-        <version>${scala-maven-plugin.version}</version>
-        <configuration>
-          <scalaVersion>${scala.version}</scalaVersion>
-          <args>
-            <arg>-language:experimental.pureFunctions</arg>
-            <arg>-Yexplicit-nulls</arg>
-            <!-- <arg>-language:strictEquality</arg> -->
-          </args>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>testCompile</goal>
-            </goals>
-            <configuration>
-              <args>
-                <arg>-language:experimental.pureFunctions</arg>
-                <arg>-Yexplicit-nulls</arg>
-                <!-- <arg>-language:strictEquality</arg> -->
-              </args>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jdepend-maven-plugin</artifactId>
-        <version>${jdepend-maven-plugin.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+
 </project>

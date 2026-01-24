@@ -11,6 +11,12 @@
     <name>MonkeyLang Lexer</name>
     <description>MonkeyLang Lexer module</description>
     <dependencies>
+        <!-- Add token module as a dependency -->
+        <dependency>
+            <groupId>com.monkylang</groupId>
+            <artifactId>token</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <!-- Module-specific dependencies can be added here if needed -->
     </dependencies>
     <build>

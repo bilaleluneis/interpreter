@@ -1,4 +1,4 @@
-enum Token {
+enum Token: Equatable {
   case EOF
   case Illigal
   case Identifier(String)

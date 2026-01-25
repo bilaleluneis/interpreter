@@ -2,6 +2,8 @@
 #project ignore list
 interpreter.iml
 build
+.build
+Packages
 .idea
 .iml
 .bloop

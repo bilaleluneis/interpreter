@@ -1,5 +1,6 @@
+use token::token::Token;
+
 use crate::lazy::LazyLexer;
-use crate::token::Token;
 
 pub trait Lexer: Clone + Copy {
     fn next_token(&mut self) -> Token;
@@ -10,7 +11,3 @@ pub trait Lexer: Clone + Copy {
 pub fn new_lexer<'a>(input: &'a str) -> impl Lexer + 'a {
     LazyLexer::new(input)
 }
-
-
-
-

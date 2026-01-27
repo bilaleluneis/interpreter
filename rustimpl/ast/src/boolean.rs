@@ -1,6 +1,5 @@
-use std::fmt::{Display, Formatter};
-use scanner::token::Token;
 use crate::node::{Expression, Node};
+use std::fmt::{Display, Formatter};
 
 pub struct Boolean {
     token: Token,
@@ -34,8 +33,8 @@ impl Display for Boolean {
 #[cfg(test)]
 mod tests {
     use crate::boolean::Boolean;
-    use scanner::token::Token;
     use crate::node::Node;
+    use scanner::token::Token;
 
     #[test]
     fn test_boolean() {
@@ -43,4 +42,3 @@ mod tests {
         assert_eq!(b.token_literal(), "Boolean(true)");
     }
 }
-

@@ -1,7 +1,8 @@
 use std::str;
 
+use token::token::Token;
+
 use crate::lexer::Lexer;
-use crate::token::Token;
 
 pub struct LazyLexer<'a> {
     input: &'a str,
@@ -11,7 +12,9 @@ pub struct LazyLexer<'a> {
 }
 
 impl<'a> Clone for LazyLexer<'a> {
-    fn clone(&self) -> Self { *self }
+    fn clone(&self) -> Self {
+        *self
+    }
 }
 
 impl<'a> Copy for LazyLexer<'a> {}
@@ -49,7 +52,7 @@ impl<'a> LazyLexer<'a> {
         let tok = Token::lookup(ch.as_str());
         match tok {
             Token::Illegal(t) => Token::Ident(t),
-            _ => tok
+            _ => tok,
         }
     }
 
@@ -82,7 +85,7 @@ impl<'a> LazyLexer<'a> {
     fn byte_to_str(&self) -> String {
         match self.ch_under_inspection {
             0u8 => "".to_string(),
-            b => str::from_utf8(&[b]).unwrap_or("").to_string()
+            b => str::from_utf8(&[b]).unwrap_or("").to_string(),
         }
     }
 
@@ -119,12 +122,14 @@ mod tests {
 
     #[test]
     fn min_lang_construct() {
-        let mut lexer = LazyLexer::new(r#"
+        let mut lexer = LazyLexer::new(
+            r#"
             let five = 5;
             let ten = 10;
             let add = fn(x, y) { x + y};
             let result = add(five, ten);
-        "#);
+        "#,
+        );
 
         let expected_tokens = [
             // let five = 5;
@@ -133,14 +138,12 @@ mod tests {
             Token::Assign,
             Token::Int(5),
             Token::Semicolon,
-
             //let ten = 10;
             Token::Let,
             Token::Ident("ten".to_string()),
             Token::Assign,
             Token::Int(10),
             Token::Semicolon,
-
             //let add = fn(x, y) {x, y};
             Token::Let,
             Token::Ident("add".to_string()),
@@ -157,7 +160,6 @@ mod tests {
             Token::Ident("y".to_string()),
             Token::Rbrace,
             Token::Semicolon,
-
             // let result = add(five, ten);
             Token::Let,
             Token::Ident("result".to_string()),
@@ -169,7 +171,7 @@ mod tests {
             Token::Ident("ten".to_string()),
             Token::Rparen,
             Token::Semicolon,
-            Token::Eof
+            Token::Eof,
         ];
         for expected_tok in expected_tokens {
             assert_eq!(lexer.next_token(), expected_tok);

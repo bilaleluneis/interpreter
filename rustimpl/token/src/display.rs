@@ -1,9 +1,9 @@
-use std::fmt::{self, Formatter};
+use std::fmt::{Display, Formatter, Result};
 
 use crate::token::Token;
 
-impl fmt::Display for Token {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+impl Display for Token {
+    fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
             Token::Illegal(s) => write!(f, "Duh..Illegal({})", s),
             Token::Ident(s) => write!(f, "Ident({})", s),

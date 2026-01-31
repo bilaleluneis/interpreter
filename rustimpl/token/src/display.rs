@@ -5,7 +5,7 @@ use crate::token::Token;
 impl Display for Token {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Token::Illegal(s) => write!(f, "Duh..Illegal({})", s),
+            Token::Illegal(s) => write!(f, "Illegal({})", s),
             Token::Ident(s) => write!(f, "Ident({})", s),
             Token::Int(i) => write!(f, "Int({})", i),
             Token::Eof => write!(f, "Eof"),

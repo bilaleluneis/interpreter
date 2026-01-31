@@ -99,7 +99,7 @@ impl<'a> LazyLexer<'a> {
 mod tests {
     use crate::lazy::LazyLexer;
     use crate::lexer::Lexer;
-    use crate::token::Token;
+    use token::token::Token;
 
     #[test]
     fn basic_lexing() {

@@ -1,3 +1,5 @@
+use token::token::Token;
+
 use crate::node::{Expression, Node};
 use std::fmt::{Display, Formatter};
 
@@ -34,7 +36,7 @@ impl Display for Boolean {
 mod tests {
     use crate::boolean::Boolean;
     use crate::node::Node;
-    use scanner::token::Token;
+    use token::token::Token;
 
     #[test]
     fn test_boolean() {

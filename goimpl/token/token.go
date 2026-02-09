@@ -1,3 +1,4 @@
+// Package token defines the token types and helpers for the interpreter.
 package token
 
 import "slices"

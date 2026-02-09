@@ -14,10 +14,11 @@ func TestXxx(t *testing.T) {
 		NewToken(SEMICOLON, ';'),
 	)
 
-	tokens = append(tokens, NewToken(EOF, 0))
-	tokens[0] = NewToken(LET, 'l')
+	copy := FromTokens(tokens)
 
-	if tokens.Len() != 6 {
-		t.Errorf("Expected 5 tokens, got %d", tokens.Len())
+	copy.Set(0, NewToken(ELSE, 'e'))
+
+	if tokens.Get(0).Type != LET {
+		t.Errorf("Expected original tokens to be unchanged, but it was modified")
 	}
 }

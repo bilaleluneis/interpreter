@@ -2,16 +2,20 @@ package token
 
 import "testing"
 
-func TestTokens_String(t *testing.T) { //nolint:paralleltest
-	// tokens := Tokens{
-	// 	{Type: IDENTIFIER, Literal: "foo"},
-	// 	{Type: ASSIGN, Literal: "="},
-	// 	{Type: INT, Literal: "42"},
-	// 	{Type: SEMICOLON, Literal: ";"},
-	// }
+func Test_immutability(t *testing.T) { //nolint:paralleltest
+	tokens := NewTokens(
+		NewToken(LET, 'l'),
+		NewToken(IDENTIFIER, 'x'),
+		NewToken(ASSIGN, '='),
+		NewToken(INT, '5'),
+		NewToken(SEMICOLON, ';'),
+	)
 
-	// expected := "[ foo = 42 ; ]"
-	// if tokens.String() != expected {
-	// 	t.Errorf("expected %q, got %q", expected, tokens.String())
-	// }
+	tokensCopy := FromTokens(tokens)
+
+	tokens.Set(0, NewToken(ELSE, 'e'))
+
+	if tokensCopy.Get(0).Type != LET {
+		t.Errorf("Expected original tokens to be unchanged, but it was modified")
+	}
 }

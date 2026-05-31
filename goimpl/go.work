@@ -1,0 +1,12 @@
+go 1.27
+
+use (
+	./ast
+	./common
+	./integration
+	./lexer
+	./main
+	./parser
+	./repl
+	./token
+)

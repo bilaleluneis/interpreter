@@ -1,8 +1,11 @@
 package token
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
-func Test_immutability(t *testing.T) { //nolint:paralleltest
+func Test_iteration(t *testing.T) {
 	tokens := NewTokens(
 		NewToken(LET, 'l'),
 		NewToken(IDENTIFIER, 'x'),
@@ -11,11 +14,43 @@ func Test_immutability(t *testing.T) { //nolint:paralleltest
 		NewToken(SEMICOLON, ';'),
 	)
 
-	tokensCopy := FromTokens(tokens)
+	var i Token
+	for i = range tokens.All() {
+		fmt.Print(i)
+	}
+	expect := Token{Type: SEMICOLON, Literal: ";"}
 
-	tokens.Set(0, NewToken(ELSE, 'e'))
+	if i != expect {
+		t.Errorf("expected last token to be SEMICOLON, got %v", i)
+	}
 
-	if tokensCopy.Get(0).Type != LET {
-		t.Errorf("Expected original tokens to be unchanged, but it was modified")
+}
+
+// test that multiple iterations over the same tokens value work correctly
+func Test_multiple_iterations(t *testing.T) {
+	tokens := NewTokens(
+		NewToken(LET, 'l'),
+		NewToken(IDENTIFIER, 'x'),
+		NewToken(ASSIGN, '='),
+		NewToken(INT, '5'),
+		NewToken(SEMICOLON, ';'),
+	)
+
+	var i Token
+	for i = range tokens.All() {
+		fmt.Print(i)
+	}
+	expect := Token{Type: SEMICOLON, Literal: ";"}
+
+	if i != expect {
+		t.Errorf("expected last token to be SEMICOLON, got %v", i)
+	}
+
+	for i = range tokens.All() {
+		fmt.Print(i)
+	}
+
+	if i != expect {
+		t.Errorf("expected last token to be SEMICOLON, got %v", i)
 	}
 }

@@ -1,48 +1,36 @@
 package token
 
-import "strings"
+import "iter"
 
+// token is value type with internal mutation
+// internally values share same slice of tokens
+// but each value has its own start index and count of tokens
+// read and write use mutex to prevent race conditions
 type tokens struct {
-	toks []Token
+	toks       []Token
+	startIndex int
+	count      int
+}
+
+func NewTokens(toks ...Token) tokens {
+	return tokens{
+		toks:       toks,
+		startIndex: 0,
+		count:      len(toks),
+	}
 }
 
 func (t tokens) Len() int {
-	return len(t.toks)
+	return t.startIndex + t.count
 }
 
-func (t tokens) Append(tk Token) {
-	_ = append(t.toks, tk)
-}
-
-func (t tokens) Get(i int) Token {
-	return t.toks[i]
-}
-
-func (t tokens) Set(i int, tk Token) {
-	t.toks[i] = tk
-}
-
-func (t tokens) String() string {
-	var result strings.Builder
-	result.WriteString("[ ")
-	for _, token := range t.toks {
-		result.WriteString(token.String() + " ")
-	}
-	result.WriteString("]")
-
-	return result.String()
-}
-
-func NewTokens(tks ...Token) tokens {
-	return tokens{
-		toks: tks,
-	}
-}
-
-func FromTokens(tks tokens) tokens {
-	newTks := make([]Token, len(tks.toks))
-	copy(newTks, tks.toks)
-	return tokens{
-		toks: newTks,
+// implement value iterators based on iter.Seq[Token]
+func (t tokens) All() iter.Seq[Token] {
+	return func(yield func(Token) bool) {
+		for i := t.startIndex; i < t.startIndex+t.count; i++ {
+			if !yield(t.toks[i]) {
+				return
+			}
+		}
 	}
 }

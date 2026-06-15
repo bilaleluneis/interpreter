@@ -8,4 +8,5 @@ use (
 	./parser
 	./repl
 	./token
+	./integration
 )

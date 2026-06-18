@@ -54,7 +54,7 @@ var ifTests = map[string]ifTestCase{
 			{Type: token.RBRACE, Literal: "}"},
 			{Type: token.EOF, Literal: ""},
 		},
-		expectedIfExpression: normalize(`if(true){
+		expectedIfExpression: normalize(`if(true) {
 			return x;
 			}`),
 	},
@@ -77,7 +77,7 @@ var ifTests = map[string]ifTestCase{
 			{Type: token.RBRACE, Literal: "}"},
 			{Type: token.EOF, Literal: ""},
 		},
-		expectedIfExpression: normalize(`if(true){
+		expectedIfExpression: normalize(`if(true) {
 				return x;
 				} else {
 				return y;

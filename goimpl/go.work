@@ -4,9 +4,7 @@ use (
 	./ast
 	./common
 	./lexer
-	./main
 	./parser
-	./repl
 	./token
 	./integration
 )

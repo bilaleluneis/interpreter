@@ -23,7 +23,7 @@ func (ie IfExpression) String() string {
 	} else {
 		out += ie.Condition.String() + ")"
 	}
-	out += ie.Conseq.String()
+	out += " " + ie.Conseq.String()
 	if len(ie.Alt.Statements) > 0 {
 		out += " else " + ie.Alt.String()
 	}

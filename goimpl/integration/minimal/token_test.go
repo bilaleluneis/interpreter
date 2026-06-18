@@ -1,9 +1,8 @@
 package minimal
 
 import (
-	"testing"
-
 	"goimpl/token"
+	"testing"
 )
 
 // Test tokenizing:
@@ -96,11 +95,11 @@ func TestToken(t *testing.T) {
 		{";", token.SEMICOLON},
 	}
 
-	for _, fx := range fixture {
+	for i, fx := range fixture {
 		t.Run(fx.lookup, func(t *testing.T) {
 			tokType := token.Lookup(fx.lookup).Type
 			if tokType != fx.want {
-				t.Fatalf("token type mismatch: got=%v want=%v", tokType, fx.want)
+				t.Fatalf("token %d: type mismatch: got=%v want=%v", i, tokType, fx.want)
 			}
 		})
 	}

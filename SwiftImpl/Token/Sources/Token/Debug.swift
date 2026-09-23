@@ -1,5 +1,5 @@
 extension Token: CustomDebugStringConvertible {
-  var debugDescription: String {
+  public var debugDescription: String {
     switch self {
     case .EOF:
       return "EOF"
@@ -39,10 +39,22 @@ extension Token: CustomDebugStringConvertible {
       return "True"
     case .False:
       return "False"
+    case .LT:
+      return "LT"
+    case .GT:
+      return "GT"
+    case .Equal:
+      return "Equal"
+    case .NotEqual:
+      return "NotEqual"
     case .Bang:
       return "Bang"
     case .Minus:
       return "Minus"
+    case .Asterisk:
+      return "Asterisk"
+    case .Slash:
+      return "Slash"
     }
   }
 }

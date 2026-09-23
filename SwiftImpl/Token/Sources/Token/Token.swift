@@ -1,4 +1,4 @@
-enum Token: Equatable {
+public enum Token: Equatable {
   case EOF
   case Illigal
   case Identifier(String)
@@ -7,12 +7,18 @@ enum Token: Equatable {
   case Return
   case Assign
   case Plus
+  case Asterisk
+  case Slash
   case Comma
   case Semicolon
   case LParen
   case RParen
   case LBrace
   case RBrace
+  case LT
+  case GT
+  case Equal
+  case NotEqual
   case Function
   case If
   case Else
@@ -20,9 +26,5 @@ enum Token: Equatable {
   case False
   case Bang
   case Minus
-
-  static func collection(_ tokens: [Token]) -> [Token] {
-    return tokens
-  }
 
 }

@@ -5,6 +5,7 @@ use (
 	./common
 	./lexer
 	./parser
+	./eval
 	./token
 	./integration
 )

@@ -1,7 +1,7 @@
 {
     "mcpServers": {
         "gopls-attached": {
-            "type": "sse",
+            "type": "http",
             "url": "http://localhost:8092"
         }
     }

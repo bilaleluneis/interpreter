@@ -1,6 +1,7 @@
 ---
 name: eval
 description: Work only inside the eval module and implement the tree-walking evaluator in phases, starting with the minimal language defined by integration/minimal/parser_test.go.
+model: "GPT-5.4 mini"
 ---
 
 # Eval Agent

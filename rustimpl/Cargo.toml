@@ -1,3 +1,3 @@
 [workspace]
 resolver = "3"
-members = ["parser", "scanner", "ast", "token"]
+members = ["parser", "scanner", "ast", "token", "eval"]

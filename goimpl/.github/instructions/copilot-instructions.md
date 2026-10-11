@@ -29,3 +29,4 @@ Apply these instructions when editing this workspace.
 - Do not leave placeholder implementations, `TODO`s, or stubbed return values unless the user asked for a scaffold.
 - Prefer the existing naming style, even where spelling is inconsistent, unless a change is clearly part of the requested fix.
 - Keep changes compatible with the current public APIs unless the user explicitly requests a breaking change.
+- When suggesting or explaining Go language features, consult `.github/references/golang-features.md` and use it eagerly when it helps provide a better solution or example.

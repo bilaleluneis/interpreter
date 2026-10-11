@@ -625,10 +625,10 @@ func TestImmutabilityProtectionWithPointersAndReferences(t *testing.T) {
 
 	stored := opt.Unwrap()
 	if stored.Items[0] != "one" {
-		t.Fatalf("expected stored slice to be isolated from input mutation, got %s", stored.Items[0])
+		t.Fatalf("expected slice to be isolated from input mutation, got %s", stored.Items[0])
 	}
 	if stored.Meta["count"] != 1 {
-		t.Fatalf("expected stored map to be isolated from input mutation, got %d", stored.Meta["count"])
+		t.Fatalf("expected map to be isolated from input mutation, got %d", stored.Meta["count"])
 	}
 
 	// 2. Mutating returned value from Unwrap/Value/Result does not affect Option
@@ -638,10 +638,10 @@ func TestImmutabilityProtectionWithPointersAndReferences(t *testing.T) {
 
 	storedAgain, _ := opt.Value()
 	if storedAgain.Items[0] != "one" {
-		t.Fatalf("expected stored value to remain unchanged after modifying unwrapped copy, got %s", storedAgain.Items[0])
+		t.Fatalf("mutation occured nmodifying unwrapped copy, got %s", storedAgain.Items[0])
 	}
 	if storedAgain.Meta["count"] != 1 {
-		t.Fatalf("expected stored map to remain unchanged after modifying unwrapped copy, got %d", storedAgain.Meta["count"])
+		t.Fatalf("mutation occured modifying unwrapped copy, got %d", storedAgain.Meta["count"])
 	}
 
 	// 3. Mutating value from Ptr does not affect Option
@@ -650,7 +650,7 @@ func TestImmutabilityProtectionWithPointersAndReferences(t *testing.T) {
 
 	storedAfterPtr := opt.Unwrap()
 	if storedAfterPtr.Items[0] != "one" {
-		t.Fatalf("expected stored value to be unaffected by mutating *Ptr(), got %s", storedAfterPtr.Items[0])
+		t.Fatalf("stored value was affected by mutating *Ptr(), got %s", storedAfterPtr.Items[0])
 	}
 
 	// 4. Tap receives isolated copy

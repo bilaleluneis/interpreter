@@ -1,67 +1,9 @@
 package common
 
 import (
-	"bytes"
-	"encoding/gob"
-	"errors"
-	"fmt"
 	"strings"
 	"testing"
 )
-
-// customSecret is a test type with unexported fields implementing GobSerializable[*customSecret].
-type customSecret struct {
-	token   string
-	tags    []string
-	weights map[string]int
-}
-
-func (c customSecret) GobEncode() ([]byte, error) {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	shadow := struct {
-		Token   string
-		Tags    []string
-		Weights map[string]int
-	}{
-		Token:   c.token,
-		Tags:    c.tags,
-		Weights: c.weights,
-	}
-	if err := enc.Encode(shadow); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-func (c *customSecret) GobDecode(data []byte) error {
-	var shadow struct {
-		Token   string
-		Tags    []string
-		Weights map[string]int
-	}
-	dec := gob.NewDecoder(bytes.NewReader(data))
-	if err := dec.Decode(&shadow); err != nil {
-		return err
-	}
-	c.token = shadow.Token
-	c.tags = shadow.Tags
-	c.weights = shadow.Weights
-	return nil
-}
-
-// failingSerializable always fails during GobEncode to verify error handling.
-type failingSerializable struct {
-	val int
-}
-
-func (f *failingSerializable) GobEncode() ([]byte, error) {
-	return nil, errors.New("simulated encode error")
-}
-
-func (f *failingSerializable) GobDecode(data []byte) error {
-	return nil
-}
 
 func TestDeepCopySuccessAndIsolation(t *testing.T) {
 	// Slices and maps isolation
@@ -74,7 +16,7 @@ func TestDeepCopySuccessAndIsolation(t *testing.T) {
 	}
 
 	c := Container{List: origSlice, Dict: origMap}
-	copied, err := DeepCopy(c)
+	copied, err := deepCopy(c)
 	if err != nil {
 		t.Fatalf("expected DeepCopy to succeed, got %v", err)
 	}
@@ -102,7 +44,7 @@ func TestDeepCopySuccessAndIsolation(t *testing.T) {
 func TestDeepCopyFailureOnUnsupportedTypes(t *testing.T) {
 	// Channels cannot be encoded by gob
 	ch := make(chan int, 1)
-	copiedCh, err := DeepCopy(ch)
+	copiedCh, err := deepCopy(ch)
 	if err == nil {
 		t.Fatal("expected DeepCopy to fail on channel")
 	}
@@ -115,7 +57,7 @@ func TestDeepCopyFailureOnUnsupportedTypes(t *testing.T) {
 
 	// Functions cannot be encoded by gob
 	fn := func() string { return "test" }
-	copiedFn, err := DeepCopy(fn)
+	copiedFn, err := deepCopy(fn)
 	if err == nil {
 		t.Fatal("expected DeepCopy to fail on function")
 	}
@@ -128,20 +70,26 @@ func TestDeepCopyFailureOnUnsupportedTypes(t *testing.T) {
 }
 
 func TestSerializeWithCustomUnexportedFields(t *testing.T) {
-	secret := &customSecret{
+	secret := customSecret{
 		token:   "s3cr3t",
 		tags:    []string{"admin", "prod"},
 		weights: map[string]int{"cpu": 100},
 	}
 
 	// Statically verified to satisfy GobSerializable[*customSecret]
-	cloned := Serialize[*customSecret](secret)
-
-	if cloned == secret {
-		t.Fatal("Serialize should return a distinct pointer")
+	cloned := Serialize(secret)
+	if !cloned.IsSome() {
+		t.Fatalf("expected Serialize to return Some, got %v", cloned.Error())
 	}
-	if cloned.token != "s3cr3t" {
-		t.Fatalf("expected token 's3cr3t', got %s", cloned.token)
+	clonedValue := cloned.Unwrap()
+
+	if clonedValue.token != "s3cr3t" ||
+		len(clonedValue.tags) != 2 ||
+		clonedValue.weights["cpu"] != 100 {
+		t.Fatalf("Serialize returned unexpected cloned value: %+v", clonedValue)
+	}
+	if clonedValue.token != "s3cr3t" {
+		t.Fatalf("expected token 's3cr3t', got %s", clonedValue.token)
 	}
 
 	// Mutate original slice & map
@@ -149,30 +97,28 @@ func TestSerializeWithCustomUnexportedFields(t *testing.T) {
 	secret.weights["cpu"] = 0
 	secret.token = "modified"
 
-	if cloned.token != "s3cr3t" {
-		t.Fatalf("expected cloned token to remain 's3cr3t', got %s", cloned.token)
+	if clonedValue.token != "s3cr3t" {
+		t.Fatalf("expected cloned token to remain 's3cr3t', got %s", clonedValue.token)
 	}
-	if cloned.tags[0] != "admin" {
-		t.Fatalf("expected cloned tag to remain 'admin', got %s", cloned.tags[0])
+	if clonedValue.tags[0] != "admin" {
+		t.Fatalf("expected cloned tag to remain 'admin', got %s", clonedValue.tags[0])
 	}
-	if cloned.weights["cpu"] != 100 {
-		t.Fatalf("expected cloned weight to remain 100, got %d", cloned.weights["cpu"])
+	if clonedValue.weights["cpu"] != 100 {
+		t.Fatalf("expected cloned weight to remain 100, got %d", clonedValue.weights["cpu"])
 	}
 }
 
-func TestSerializePanicOnFailure(t *testing.T) {
+func TestSerializeFailureReturnsNone(t *testing.T) {
 	failing := &failingSerializable{val: 42}
 
-	defer func() {
-		r := recover()
-		if r == nil {
-			t.Fatal("expected Serialize to panic when encoding fails")
-		}
-		errMsg := fmt.Sprint(r)
-		if !strings.Contains(errMsg, "Serialize failed") {
-			t.Fatalf("expected panic message to contain 'Serialize failed', got %v", r)
-		}
-	}()
-
-	Serialize[*failingSerializable](failing)
+	serialized := Serialize(*failing)
+	if !serialized.IsNone() {
+		t.Fatalf("expected Serialize to return None on encode failure, got %v", serialized)
+	}
+	if serialized.Error() == nil {
+		t.Fatal("expected Serialize to return an error on failure")
+	}
+	if !strings.Contains(serialized.Error().Error(), "failed to encode") {
+		t.Fatalf("expected encode failure message, got %v", serialized.Error())
+	}
 }

@@ -1,6 +1,8 @@
-## Go Impl Workspace Instructions
+## Go Impl Repository Instructions
 
-Apply these instructions when editing this workspace.
+Apply these instructions repository-wide whenever this workspace is active, including in chat, agents, code suggestions, and when making code changes.
+
+These instructions are the default baseline for the workspace. Agents and skills should follow them unless a more specific instruction file, skill, or user request overrides a rule.
 
 ### Tooling and language level
 
@@ -29,4 +31,7 @@ Apply these instructions when editing this workspace.
 - Do not leave placeholder implementations, `TODO`s, or stubbed return values unless the user asked for a scaffold.
 - Prefer the existing naming style, even where spelling is inconsistent, unless a change is clearly part of the requested fix.
 - Keep changes compatible with the current public APIs unless the user explicitly requests a breaking change.
-- When suggesting or explaining Go language features, consult `.github/references/golang-features.md` and use it eagerly when it helps provide a better solution or example.
+- When answering questions or providing code suggestions about Go language features that may be newer than the model's built-in knowledge, or newer than the current supported baseline, consult `.github/references/features.md` before responding.
+- Treat `.github/references/features.md` as the source of truth for project-specific Go 1.26 and Go 1.27 feature guidance.
+- When suggesting or explaining Go language features, consult `.github/references/features.md` and use it eagerly when it helps provide a better solution or example.
+- When a solution pattern matches one covered in `.github/references/best-practices.md`, consult that file and prefer the shaped solution it recommends when it improves clarity, composability, or maintainability.

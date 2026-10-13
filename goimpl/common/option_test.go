@@ -211,15 +211,6 @@ func TestErrorAsGenericAndMethod(t *testing.T) {
 	customErr := &customTestError{code: 403, message: "forbidden"}
 	opt := Err[int](fmt.Errorf("request failed: %w", customErr))
 
-	// Generic function ErrorAs[E]
-	extracted, ok := ErrorAs[*customTestError](opt)
-	if !ok {
-		t.Fatal("expected ErrorAs to extract *customTestError")
-	}
-	if extracted.code != 403 || extracted.message != "forbidden" {
-		t.Fatalf("unexpected extracted error fields: %+v", extracted)
-	}
-
 	// Method AsError
 	var target *customTestError
 	if !opt.AsError(&target) {
@@ -231,43 +222,36 @@ func TestErrorAsGenericAndMethod(t *testing.T) {
 
 	// Failure case on Some
 	someOpt := Some(123)
-	if _, ok := ErrorAs[*customTestError](someOpt); ok {
-		t.Fatal("ErrorAs on Some should return false")
-	}
 	if someOpt.AsError(&target) {
 		t.Fatal("AsError on Some should return false")
 	}
 }
 
 func TestTransformFunctions(t *testing.T) {
-	// MapOption transforms int to string
 	optInt := Some(42)
-	optStr := MapOption(optInt, func(v int) string {
+	optStr := optInt.Map(func(v int) string {
 		return fmt.Sprintf("val=%d", v)
 	})
 	if !optStr.IsSome() || optStr.Unwrap() != "val=42" {
 		t.Fatalf("expected 'val=42', got %v", optStr)
 	}
 
-	// FlatMapOption int to string
-	optFlat := FlatMapOption(optInt, func(v int) Option[string] {
+	optFlat := optInt.FlatMap(func(v int) Option[string] {
 		return Some(fmt.Sprintf("flat=%d", v))
 	})
 	if optFlat.Unwrap() != "flat=42" {
 		t.Fatalf("expected 'flat=42', got %v", optFlat)
 	}
 
-	// FlatMapOption propagation of error
 	errOpt := Err[int](errors.New("upstream err"))
-	optFlatErr := FlatMapOption(errOpt, func(v int) Option[string] {
+	optFlatErr := errOpt.FlatMap(func(v int) Option[string] {
 		return Some("won't run")
 	})
 	if !optFlatErr.IsNone() || optFlatErr.Error().Error() != "upstream err" {
 		t.Fatalf("expected error propagated, got %v", optFlatErr)
 	}
 
-	// Match
-	matchRes := Match(optInt,
+	matchRes := optInt.Match(
 		func(v int) string { return fmt.Sprintf("success %d", v) },
 		func(err error) string { return "failure" },
 	)
@@ -275,12 +259,37 @@ func TestTransformFunctions(t *testing.T) {
 		t.Fatalf("expected 'success 42', got %s", matchRes)
 	}
 
-	matchErrRes := Match(errOpt,
+	matchErrRes := errOpt.Match(
 		func(v int) string { return "success" },
 		func(err error) string { return fmt.Sprintf("err: %s", err) },
 	)
 	if matchErrRes != "err: upstream err" {
 		t.Fatalf("expected 'err: upstream err', got %s", matchErrRes)
+	}
+}
+
+func TestGenericMethodChainingWithTypeChanges(t *testing.T) {
+	opt := Some(5).
+		Map(func(v int) string {
+			return fmt.Sprintf("n=%d", v)
+		}).
+		AndThen(func(v string) Option[int] {
+			return Some(len(v))
+		}).
+		Then(func(v int) (string, error) {
+			return fmt.Sprintf("len=%d", v), nil
+		})
+
+	if !opt.IsSome() || opt.Unwrap() != "len=3" {
+		t.Fatalf("expected len=3, got %v", opt)
+	}
+
+	matched := opt.Match(
+		func(v string) string { return "ok:" + v },
+		func(err error) string { return "err:" + err.Error() },
+	)
+	if matched != "ok:len=3" {
+		t.Fatalf("expected ok:len=3, got %s", matched)
 	}
 }
 
@@ -572,32 +581,39 @@ func TestCrossTypeChainingFunctions(t *testing.T) {
 	}
 
 	optStr := Ok("123")
-	optInt := Then(optStr, parseInt)
+	optInt := optStr.Then(parseInt)
 	if !optInt.IsSome() || optInt.Unwrap() != 123 {
 		t.Fatalf("expected 123, got %v", optInt)
 	}
 
-	optErr := Then(Ok("invalid"), parseInt)
+	optErr := Ok("invalid").Then(parseInt)
 	if !optErr.IsNone() {
 		t.Fatal("expected failure on invalid")
 	}
 
-	// Zip and ZipWith
 	optA := Ok(10)
 	optB := Ok("stars")
-	zipped := Zip(optA, optB)
+	type zippedPair struct {
+		First  int
+		Second string
+	}
+	zipped := optA.ZipWith(optB, func(a int, b string) zippedPair {
+		return zippedPair{First: a, Second: b}
+	})
 	if !zipped.IsSome() || zipped.Unwrap().First != 10 || zipped.Unwrap().Second != "stars" {
 		t.Fatalf("unexpected zipped result: %+v", zipped)
 	}
 
-	zipFormatted := ZipWith(optA, optB, func(a int, b string) string {
+	zipFormatted := optA.ZipWith(optB, func(a int, b string) string {
 		return fmt.Sprintf("%d %s", a, b)
 	})
 	if zipFormatted.Unwrap() != "10 stars" {
 		t.Fatalf("expected '10 stars', got %s", zipFormatted.Unwrap())
 	}
 
-	zipFail := Zip(Err[int](errors.New("failA")), optB)
+	zipFail := Err[int](errors.New("failA")).ZipWith(optB, func(a int, b string) string {
+		return fmt.Sprintf("%d %s", a, b)
+	})
 	if !zipFail.IsNone() || zipFail.Error().Error() != "failA" {
 		t.Fatalf("expected failA, got %v", zipFail)
 	}
@@ -608,8 +624,8 @@ type mutableData struct {
 	Meta  map[string]int
 }
 
-func TestImmutabilityProtectionWithPointersAndReferences(t *testing.T) {
-	// 1. Mutating input slice/map after Some does not affect Option
+func TestOptionSharesUnderlyingReferences(t *testing.T) {
+	// 1. Mutating input slice/map after Some is visible through Option
 	origSlice := []string{"one", "two"}
 	origMap := map[string]int{"count": 1}
 	d := mutableData{
@@ -624,48 +640,49 @@ func TestImmutabilityProtectionWithPointersAndReferences(t *testing.T) {
 	origMap["count"] = 999
 
 	stored := opt.Unwrap()
-	if stored.Items[0] != "one" {
-		t.Fatalf("expected slice to be isolated from input mutation, got %s", stored.Items[0])
+	if stored.Items[0] != "mutated" {
+		t.Fatalf("expected slice mutation to be visible through Option, got %s", stored.Items[0])
 	}
-	if stored.Meta["count"] != 1 {
-		t.Fatalf("expected map to be isolated from input mutation, got %d", stored.Meta["count"])
+	if stored.Meta["count"] != 999 {
+		t.Fatalf("expected map mutation to be visible through Option, got %d", stored.Meta["count"])
 	}
 
-	// 2. Mutating returned value from Unwrap/Value/Result does not affect Option
+	// 2. Mutating returned value from Unwrap/Value/Result is visible because nested
+	// reference data is shared.
 	unwrapped := opt.Unwrap()
 	unwrapped.Items[0] = "tampered"
 	unwrapped.Meta["count"] = 888
 
 	storedAgain, _ := opt.Value()
-	if storedAgain.Items[0] != "one" {
-		t.Fatalf("mutation occured nmodifying unwrapped copy, got %s", storedAgain.Items[0])
+	if storedAgain.Items[0] != "tampered" {
+		t.Fatalf("expected mutation to be visible after Unwrap, got %s", storedAgain.Items[0])
 	}
-	if storedAgain.Meta["count"] != 1 {
-		t.Fatalf("mutation occured modifying unwrapped copy, got %d", storedAgain.Meta["count"])
+	if storedAgain.Meta["count"] != 888 {
+		t.Fatalf("expected mutation to be visible after Unwrap, got %d", storedAgain.Meta["count"])
 	}
 
-	// 3. Mutating value from Ptr does not affect Option
+	// 3. Mutating value from Ptr is also visible through Option.
 	p := opt.Ptr()
 	p.Items[0] = "ptr_tampered"
 
 	storedAfterPtr := opt.Unwrap()
-	if storedAfterPtr.Items[0] != "one" {
-		t.Fatalf("stored value was affected by mutating *Ptr(), got %s", storedAfterPtr.Items[0])
+	if storedAfterPtr.Items[0] != "ptr_tampered" {
+		t.Fatalf("expected Ptr mutation to be visible, got %s", storedAfterPtr.Items[0])
 	}
 
-	// 4. Tap receives isolated copy
+	// 4. Tap receives the stored value directly.
 	opt.Tap(func(v mutableData) {
 		v.Items[0] = "tapped_mutation"
 	})
-	if opt.Unwrap().Items[0] != "one" {
-		t.Fatalf("expected stored value to be unaffected by mutations inside Tap")
+	if opt.Unwrap().Items[0] != "tapped_mutation" {
+		t.Fatalf("expected mutation inside Tap to be visible, got %s", opt.Unwrap().Items[0])
 	}
 
-	// 5. Fold receives isolated copy
+	// 5. Fold receives the stored value directly.
 	opt.Fold(func(v mutableData) {
 		v.Items[0] = "fold_mutation"
 	}, func(err error) {})
-	if opt.Unwrap().Items[0] != "one" {
-		t.Fatalf("expected stored value to be unaffected by mutations inside Fold")
+	if opt.Unwrap().Items[0] != "fold_mutation" {
+		t.Fatalf("expected mutation inside Fold to be visible, got %s", opt.Unwrap().Items[0])
 	}
 }

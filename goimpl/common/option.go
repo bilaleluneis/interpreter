@@ -1,4 +1,4 @@
-// Package common provides core shared constraints, immutability helpers, and monadic types.
+// Package common provides core shared constraints and monadic types.
 package common
 
 import (
@@ -13,7 +13,7 @@ var (
 	ErrPredicateFailed = errors.New("predicate check failed")
 )
 
-// Option represents an immutable optional value of type T, which either contains
+// Option represents an optional value of type T, which either contains
 // a value of type T (Some/Ok) or an error implementing Go's error interface (None/Err).
 // It enables clean, fluent method chaining as an alternative to verbose "if err != nil" checks.
 type Option[T any] struct {
@@ -23,15 +23,10 @@ type Option[T any] struct {
 }
 
 // Some creates an Option containing a successful value of type T.
-// A deep copy of value is made when possible to guarantee value isolation and immutability.
-// If DeepCopy fails, an Err Option with the failure error is returned.
+// The value is stored directly without additional cloning.
 func Some[T any](value T) Option[T] {
-	copied, err := DeepCopy(value)
-	if err != nil {
-		return Err[T](err)
-	}
 	return Option[T]{
-		value:    copied,
+		value:    value,
 		hasValue: true,
 	}
 }
@@ -152,18 +147,13 @@ func (o Option[T]) IsErr() bool {
 }
 
 // Value returns the contained value and true if present, or zero value of T and false.
-// Returns a defensive deep copy when possible to preserve value semantics.
+// The returned value is a direct copy of the stored value.
 func (o Option[T]) Value() (T, bool) {
 	if !o.hasValue {
 		var zero T
 		return zero, false
 	}
-	copied, err := DeepCopy(o.value)
-	if err != nil {
-		var zero T
-		return zero, false
-	}
-	return copied, true
+	return o.value, true
 }
 
 // Error returns the underlying error if None/Err, or nil if Some/Ok.
@@ -179,83 +169,57 @@ func (o Option[T]) Error() error {
 }
 
 // Result unpacks the Option into a standard Go (T, error) tuple.
-// Returns a defensive deep copy when possible to prevent external mutation of internal state.
+// The returned value is a direct copy of the stored value.
 func (o Option[T]) Result() (T, error) {
 	if o.hasValue {
-		copied, err := DeepCopy(o.value)
-		if err != nil {
-			var zero T
-			return zero, err
-		}
-		return copied, nil
+		return o.value, nil
 	}
 	var zero T
 	return zero, o.Error()
 }
 
 // Unwrap returns the value if present, or panics with the error.
-// Returns a defensive deep copy when possible to preserve immutability.
+// The returned value is a direct copy of the stored value.
 func (o Option[T]) Unwrap() T {
 	if !o.hasValue {
 		panic(fmt.Sprintf("called Unwrap() on None Option: %v", o.Error()))
 	}
-	copied, err := DeepCopy(o.value)
-	if err != nil {
-		panic(fmt.Sprintf("called Unwrap() failed to copy value: %v", err))
-	}
-	return copied
+	return o.value
 }
 
-// UnwrapOr returns the value if present, or defaultValue if None or if copying fails.
+// UnwrapOr returns the value if present, or defaultValue if None.
 func (o Option[T]) UnwrapOr(defaultValue T) T {
 	if !o.hasValue {
 		return defaultValue
 	}
-	copied, err := DeepCopy(o.value)
-	if err != nil {
-		return defaultValue
-	}
-	return copied
+	return o.value
 }
 
-// UnwrapOrElse returns the value if present, or evaluates fn(err) if None or if copying fails.
+// UnwrapOrElse returns the value if present, or evaluates fn(err) if None.
 func (o Option[T]) UnwrapOrElse(fn func(error) T) T {
 	if !o.hasValue {
 		return fn(o.Error())
 	}
-	copied, err := DeepCopy(o.value)
-	if err != nil {
-		return fn(err)
-	}
-	return copied
+	return o.value
 }
 
 // UnwrapOrDefault returns the contained value if present,
-// or the zero value of T if None or if copying fails.
+// or the zero value of T if None.
 func (o Option[T]) UnwrapOrDefault() T {
 	if !o.hasValue {
 		var zero T
 		return zero
 	}
-	copied, err := DeepCopy(o.value)
-	if err != nil {
-		var zero T
-		return zero
-	}
-	return copied
+	return o.value
 }
 
-// Ptr returns a pointer to a copy of the value if present, or nil if None or if copying fails.
-// It returns an independent copy so mutating the referenced value does not affect the Option.
+// Ptr returns a pointer to the contained value if present, or nil if None.
+// The pointer references the receiver copy's stored value.
 func (o Option[T]) Ptr() *T {
 	if !o.hasValue {
 		return nil
 	}
-	copied, err := DeepCopy(o.value)
-	if err != nil {
-		return nil
-	}
-	return &copied
+	return &o.value
 }
 
 // Is reports whether any error in the Option's error tree matches target using errors.Is.
@@ -276,34 +240,34 @@ func (o Option[T]) AsError(target any) bool {
 	return errors.As(o.Error(), target)
 }
 
-// Then chains a fallible operation returning (T, error).
+// Then chains a fallible operation returning (U, error).
 // If the Option is Some, fn is invoked with the contained value.
 // If fn returns a non-nil error, an Err Option is returned.
 // If the Option is None, the failure is propagated without invoking fn.
 // This replaces verbose "if err != nil" checks with a clean fluent call.
-func (o Option[T]) Then(fn func(T) (T, error)) Option[T] {
+func (o Option[T]) Then[U any](fn func(T) (U, error)) Option[U] {
 	if !o.hasValue {
-		return o
+		return Err[U](o.Error())
 	}
 	val, err := fn(o.value)
 	if err != nil {
-		return Err[T](err)
+		return Err[U](err)
 	}
 	return Some(val)
 }
 
-// ThenOk chains an operation returning (T, bool), such as a map lookup or lookup function.
+// ThenOk chains an operation returning (U, bool), such as a map lookup or lookup function.
 // If fn returns false, it returns an Err with the provided error (or ErrNone).
-func (o Option[T]) ThenOk(fn func(T) (T, bool), err ...error) Option[T] {
+func (o Option[T]) ThenOk[U any](fn func(T) (U, bool), err ...error) Option[U] {
 	if !o.hasValue {
-		return o
+		return Err[U](o.Error())
 	}
 	val, ok := fn(o.value)
 	if !ok {
 		if len(err) > 0 && err[0] != nil {
-			return Err[T](err[0])
+			return Err[U](err[0])
 		}
-		return Err[T](ErrNone)
+		return Err[U](ErrNone)
 	}
 	return Some(val)
 }
@@ -322,14 +286,19 @@ func (o Option[T]) Check(fn func(T) error) Option[T] {
 	return o
 }
 
-// AndThen chains operations on the success path.
+// FlatMap chains operations on the success path.
 // If the Option is Some, fn is invoked with the value.
 // If the Option is None, the failure is propagated unchanged.
-func (o Option[T]) AndThen(fn func(T) Option[T]) Option[T] {
+func (o Option[T]) FlatMap[U any](fn func(T) Option[U]) Option[U] {
 	if !o.hasValue {
-		return o
+		return Err[U](o.Error())
 	}
 	return fn(o.value)
+}
+
+// AndThen is an alias for FlatMap.
+func (o Option[T]) AndThen[U any](fn func(T) Option[U]) Option[U] {
+	return o.FlatMap(fn)
 }
 
 // OrElse chains operations on the failure path.
@@ -352,9 +321,9 @@ func (o Option[T]) OrElseValue(fallback T) Option[T] {
 
 // Map applies fn to the contained value if Some, returning Some(fn(value)).
 // If None, the failure is propagated unchanged.
-func (o Option[T]) Map(fn func(T) T) Option[T] {
+func (o Option[T]) Map[U any](fn func(T) U) Option[U] {
 	if !o.hasValue {
-		return o
+		return Err[U](o.Error())
 	}
 	return Some(fn(o.value))
 }
@@ -385,13 +354,10 @@ func (o Option[T]) Filter(predicate func(T) bool, err ...error) Option[T] {
 }
 
 // Tap executes action if Some, and returns self for method chaining.
-// A defensive copy of the value is provided to action
-// so side effects cannot mutate internal state.
+// The stored value is passed directly to action.
 func (o Option[T]) Tap(action func(T)) Option[T] {
 	if o.hasValue {
-		if copied, err := DeepCopy(o.value); err == nil {
-			action(copied)
-		}
+		action(o.value)
 	}
 	return o
 }
@@ -437,121 +403,32 @@ func (o Option[T]) RecoverWith(fn func(error) (T, error)) Option[T] {
 }
 
 // Fold executes onSuccess if Some, or onFailure if None.
-// A defensive copy of the value is provided to onSuccess
-// so external callers cannot mutate internal state.
+// The stored value is passed directly to onSuccess.
 func (o Option[T]) Fold(onSuccess func(T), onFailure func(error)) {
 	if o.hasValue {
-		copied, err := DeepCopy(o.value)
-		if err != nil {
-			onFailure(err)
-		} else {
-			onSuccess(copied)
-		}
+		onSuccess(o.value)
 	} else {
 		onFailure(o.Error())
 	}
 }
 
-// Pair holds two values of types T and U.
-type Pair[T any, U any] struct {
-	First  T
-	Second U
-}
-
-// Then chains a fallible operation transforming T into U via (U, error).
-// If opt is Some, fn is invoked with the contained value.
-// If opt is None, the failure is propagated.
-func Then[T any, U any](opt Option[T], fn func(T) (U, error)) Option[U] {
-	if !opt.hasValue {
-		return Err[U](opt.Error())
-	}
-	val, err := fn(opt.value)
-	if err != nil {
-		return Err[U](err)
-	}
-	return Some(val)
-}
-
-// Map transforms an Option[T] into Option[U] by applying fn to the contained value.
-func Map[T any, U any](opt Option[T], fn func(T) U) Option[U] {
-	if !opt.hasValue {
-		return Err[U](opt.Error())
-	}
-	return Some(fn(opt.value))
-}
-
-// FlatMap transforms an Option[T] into Option[U] by applying fn to the contained value.
-func FlatMap[T any, U any](opt Option[T], fn func(T) Option[U]) Option[U] {
-	if !opt.hasValue {
-		return Err[U](opt.Error())
-	}
-	return fn(opt.value)
-}
-
-// AndThen is an alias for FlatMap.
-func AndThen[T any, U any](opt Option[T], fn func(T) Option[U]) Option[U] {
-	return FlatMap(opt, fn)
-}
-
-// MapOption is an alias for Map.
-func MapOption[T any, U any](opt Option[T], fn func(T) U) Option[U] {
-	return Map(opt, fn)
-}
-
-// FlatMapOption is an alias for FlatMap.
-func FlatMapOption[T any, U any](opt Option[T], fn func(T) Option[U]) Option[U] {
-	return FlatMap(opt, fn)
-}
-
 // Match executes onSuccess or onFailure and returns the computed result R.
-// A defensive copy of the value is provided to onSuccess to preserve immutability.
-func Match[T any, R any](opt Option[T], onSuccess func(T) R, onFailure func(error) R) R {
-	if opt.hasValue {
-		copied, err := DeepCopy(opt.value)
-		if err != nil {
-			return onFailure(err)
-		}
-		return onSuccess(copied)
+// The stored value is passed directly to onSuccess.
+func (o Option[T]) Match[R any](onSuccess func(T) R, onFailure func(error) R) R {
+	if o.hasValue {
+		return onSuccess(o.value)
 	}
-	return onFailure(opt.Error())
-}
-
-// Zip combines two options into an Option[Pair[T, U]].
-// If either option is None, the first encountered error is returned.
-func Zip[T any, U any](optA Option[T], optB Option[U]) Option[Pair[T, U]] {
-	return ZipWith(optA, optB, func(a T, b U) Pair[T, U] {
-		return Pair[T, U]{First: a, Second: b}
-	})
+	return onFailure(o.Error())
 }
 
 // ZipWith combines two options using fn into an Option[R].
-// If optA is None, optA's error is returned; otherwise if optB is None, optB's error is returned.
-func ZipWith[T any, U any, R any](optA Option[T], optB Option[U], fn func(T, U) R) Option[R] {
-	if !optA.hasValue {
-		return Err[R](optA.Error())
+// If the receiver is None, its error is returned; otherwise if other is None, other's error is returned.
+func (o Option[T]) ZipWith[U any, R any](other Option[U], fn func(T, U) R) Option[R] {
+	if !o.hasValue {
+		return Err[R](o.Error())
 	}
-	if !optB.hasValue {
-		return Err[R](optB.Error())
+	if !other.hasValue {
+		return Err[R](other.Error())
 	}
-	return Some(fn(optA.value, optB.value))
-}
-
-// ErrorAs extracts a concrete error type E from the Option's error.
-// Returns the concrete error and true if matched, or the zero value of E and false otherwise.
-func ErrorAs[E error, T any](opt Option[T]) (E, bool) {
-	var target E
-	if opt.IsSome() {
-		return target, false
-	}
-	err := opt.Error()
-	if err == nil {
-		return target, false
-	}
-	if concrete, ok := err.(E); ok {
-		return concrete, true
-	}
-	if errors.As(err, &target) {
-		return target, true
-	}
-	return target, false
+	return Some(fn(o.value, other.value))
 }

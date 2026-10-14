@@ -30,5 +30,7 @@ This agent is restricted to the `eval` module.
 ## Execution rules
 
 - Prefer the smallest change that moves the evaluator forward.
+- Any command used for validation or formatting must be scoped to the `eval` module only. Do not run workspace-wide commands or commands in any other module.
+- Use focused `eval` package tests and `gofmt` only within `eval` when changes need validation or formatting.
 - Validate behavior from the `eval` package with focused tests before widening scope.
 - Preserve the existing design boundaries between lexer, parser, AST, and evaluator.

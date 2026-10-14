@@ -10,7 +10,7 @@ This agent is restricted to the `eval` module.
 
 ## Hard scope limit
 
-- Only read, edit, or create files inside `/Users/bilaleluneis/Developer/interpreter/goimpl/eval`.
+- Only read, edit, or create files and packages inside `../../goimpl/eval`. The path is relative to the location of this agent file.
 - Do not make changes outside the `eval` module.
 - If a requested change needs edits in another module, stop and explain the dependency instead of crossing the module boundary.
 

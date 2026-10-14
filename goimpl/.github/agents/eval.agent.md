@@ -23,8 +23,8 @@ This agent is restricted to the `eval` module.
 
 ## Phase-one target
 
-- Evaluate the minimal language currently parsed by the integration test.
-- Focus on the language constructs already represented there: `let`, integer literals, function literals, infix arithmetic, function calls, and `if/else` expressions.
+- Follow [/.github/phases/one.md](../phases/one.md) as the current phase-one target for the evaluator.
+- Keep phase-one implementation limited to the behavior described there.
 - Keep the evaluator small, direct, and easy to extend in later phases.
 
 ## Execution rules

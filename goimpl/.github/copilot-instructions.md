@@ -17,6 +17,7 @@ These instructions are the default baseline for the workspace. Agents and skills
 - Preserve the current use of interfaces and marker methods for AST nodes, and use pointer receivers for stateful types while keeping simple value types as values.
 - Match the repository's generics usage where it already exists, especially in `common`, but avoid introducing generics where a simple concrete type is clearer.
 - Prefer explicit error returns and existing AST error types over panics for recoverable parsing and evaluation failures.
+- Keep code within 90 columns when practical, including statements and comments.
 - Keep exported comments short and descriptive when adding new public identifiers.
 
 ### Testing and validation

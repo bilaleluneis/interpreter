@@ -15,12 +15,16 @@ mod tests {
 
     fn sample_tokens() -> Vec<Token> {
         vec![
-            Token::Illegal("".to_string()),
+            Token::Illegal(String::new()),
             Token::Ident("x".to_string()),
             Token::Int(42),
             Token::Eof,
             Token::Assign,
             Token::Plus,
+            Token::Asterisk,
+            Token::Lt,
+            Token::If,
+            Token::Else,
             Token::Comma,
             Token::Semicolon,
             Token::Lparen,

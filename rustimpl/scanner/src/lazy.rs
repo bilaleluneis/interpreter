@@ -4,6 +4,7 @@ use token::token::Token;
 
 use crate::lexer::Lexer;
 
+#[derive(Clone, Copy)]
 pub struct LazyLexer<'a> {
     input: &'a str,
     prev_read_position: usize,
@@ -11,18 +12,10 @@ pub struct LazyLexer<'a> {
     ch_under_inspection: u8,
 }
 
-impl<'a> Clone for LazyLexer<'a> {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-
-impl<'a> Copy for LazyLexer<'a> {}
-
-impl<'a> Lexer for LazyLexer<'a> {
+impl Lexer for LazyLexer<'_> {
     fn next_token(&mut self) -> Token {
         while self.peek().is_ascii_whitespace() {
-            self.advance()
+            self.advance();
         }
 
         match self.next_char().as_str() {
@@ -34,8 +27,10 @@ impl<'a> Lexer for LazyLexer<'a> {
     }
 }
 
+#[allow(clippy::elidable_lifetime_names)]
 impl<'a> LazyLexer<'a> {
-    pub fn new(input: &'a str) -> Self {
+    #[must_use]
+    pub const fn new(input: &'a str) -> Self {
         LazyLexer {
             input,
             prev_read_position: 0,
@@ -72,24 +67,22 @@ impl<'a> LazyLexer<'a> {
     }
 
     fn peek(&self) -> u8 {
-        let pos = self.next_read_position;
-        let ch = if pos >= self.input.len() {
-            0u8
-        } else {
-            self.input.as_bytes()[pos]
-        };
-        ch
+        self.input
+            .as_bytes()
+            .get(self.next_read_position)
+            .copied()
+            .unwrap_or(0u8)
     }
 
     //TODO: come up with better name
     fn byte_to_str(&self) -> String {
         match self.ch_under_inspection {
-            0u8 => "".to_string(),
+            0u8 => String::new(),
             b => str::from_utf8(&[b]).unwrap_or("").to_string(),
         }
     }
 
-    fn advance(&mut self) {
+    pub const fn advance(&mut self) {
         self.prev_read_position = self.next_read_position;
         self.next_read_position += 1;
     }
@@ -123,12 +116,12 @@ mod tests {
     #[test]
     fn min_lang_construct() {
         let mut lexer = LazyLexer::new(
-            r#"
+            r"
             let five = 5;
             let ten = 10;
             let add = fn(x, y) { x + y};
             let result = add(five, ten);
-        "#,
+        ",
         );
 
         let expected_tokens = [
@@ -170,6 +163,66 @@ mod tests {
             Token::Comma,
             Token::Ident("ten".to_string()),
             Token::Rparen,
+            Token::Semicolon,
+            Token::Eof,
+        ];
+        for expected_tok in expected_tokens {
+            assert_eq!(lexer.next_token(), expected_tok);
+        }
+    }
+
+    #[test]
+    fn phase_one_sample_with_if_else_and_operators() {
+        let mut lexer = LazyLexer::new(
+            "let mul = fn(x, y) { x * y };
+             let result = if(five < ten) { mul(five, ten) } else { add(five, ten) };",
+        );
+
+        let ident = |s: &str| Token::Ident(s.to_string());
+        let expected_tokens = [
+            // let mul = fn(x, y) { x * y };
+            Token::Let,
+            ident("mul"),
+            Token::Assign,
+            Token::Function,
+            Token::Lparen,
+            ident("x"),
+            Token::Comma,
+            ident("y"),
+            Token::Rparen,
+            Token::Lbrace,
+            ident("x"),
+            Token::Asterisk,
+            ident("y"),
+            Token::Rbrace,
+            Token::Semicolon,
+            // let result = if(five < ten) { mul(five, ten) } else { add(five, ten) };
+            Token::Let,
+            ident("result"),
+            Token::Assign,
+            Token::If,
+            Token::Lparen,
+            ident("five"),
+            Token::Lt,
+            ident("ten"),
+            Token::Rparen,
+            Token::Lbrace,
+            ident("mul"),
+            Token::Lparen,
+            ident("five"),
+            Token::Comma,
+            ident("ten"),
+            Token::Rparen,
+            Token::Rbrace,
+            Token::Else,
+            Token::Lbrace,
+            ident("add"),
+            Token::Lparen,
+            ident("five"),
+            Token::Comma,
+            ident("ten"),
+            Token::Rparen,
+            Token::Rbrace,
             Token::Semicolon,
             Token::Eof,
         ];

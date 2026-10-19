@@ -8,6 +8,7 @@ pub trait Lexer: Clone + Copy {
 
 // the warning is not correct, as lifetime is needed
 #[allow(clippy::needless_lifetimes)]
-pub fn new_lexer<'a>(input: &'a str) -> impl Lexer + 'a {
+#[must_use]
+pub fn new_lexer(input: &str) -> impl Lexer + '_ {
     LazyLexer::new(input)
 }

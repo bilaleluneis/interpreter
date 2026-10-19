@@ -1,4 +1,4 @@
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum Token {
     Illegal(String),
     Ident(String),
@@ -6,6 +6,8 @@ pub enum Token {
     Eof,
     Assign,
     Plus,
+    Asterisk,
+    Lt,
     Comma,
     Semicolon,
     Lparen,
@@ -14,5 +16,7 @@ pub enum Token {
     Rbrace,
     Function,
     Let,
+    If,
+    Else,
     Boolean(bool),
 }

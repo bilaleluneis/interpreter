@@ -9,8 +9,9 @@ pub struct Boolean {
 }
 
 impl Boolean {
-    pub fn new(token: Token, value: bool) -> Boolean {
-        Boolean { token, value }
+    #[must_use]
+    pub const fn new(token: Token, value: bool) -> Self {
+        Self { token, value }
     }
 }
 

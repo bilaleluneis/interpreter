@@ -1,2 +1,2 @@
 #![allow(dead_code)]
-mod combinator;
+pub mod combinator;

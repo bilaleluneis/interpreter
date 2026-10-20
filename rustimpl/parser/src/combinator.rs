@@ -1,6 +1,7 @@
 use scanner::lexer::Lexer;
 
 #[derive(Clone, Debug)]
+/// Minimal parser wrapper used to compose parser transformations.
 pub struct CombinatorParser<L: Lexer> {
     lexer: L,
 }
@@ -11,6 +12,7 @@ impl<L: Lexer> CombinatorParser<L> {
     }
 
     // Example: a method to parse something
+    /// Runs the parser entry point.
     pub const fn parse(&self) {
         let Self { lexer: _ } = self;
         // Implement your parsing logic here
@@ -18,6 +20,7 @@ impl<L: Lexer> CombinatorParser<L> {
 }
 
 // Example of a combinator function
+/// Applies a parser transformation and returns the updated parser.
 pub fn map<L, F>(mut parser: CombinatorParser<L>, f: F) -> CombinatorParser<L>
 where
     L: Lexer,

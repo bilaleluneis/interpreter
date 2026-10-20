@@ -3,12 +3,14 @@ use token::token::Token;
 use crate::node::{Expression, Node};
 use std::fmt::{Display, Formatter};
 
+/// AST node representing a boolean literal expression.
 pub struct Boolean {
     token: Token,
     value: bool,
 }
 
 impl Boolean {
+    /// Creates a boolean literal node from its token and value.
     #[must_use]
     pub const fn new(token: Token, value: bool) -> Self {
         Self { token, value }

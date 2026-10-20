@@ -1,6 +1,7 @@
 use crate::token::Token;
 
 impl Token {
+    /// Maps a source lexeme into its corresponding [`Token`].
     pub fn lookup(possible_tok: &str) -> Self {
         match possible_tok {
             "" => Self::Eof,

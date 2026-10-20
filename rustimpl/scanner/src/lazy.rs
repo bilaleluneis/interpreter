@@ -5,6 +5,7 @@ use token::token::Token;
 use crate::lexer::Lexer;
 
 #[derive(Clone, Copy)]
+/// A pull-based lexer that reads one byte at a time from the input slice.
 pub struct LazyLexer<'a> {
     input: &'a str,
     prev_read_position: usize,
@@ -29,6 +30,7 @@ impl Lexer for LazyLexer<'_> {
 
 #[allow(clippy::elidable_lifetime_names)]
 impl<'a> LazyLexer<'a> {
+    /// Creates a lexer over the provided input.
     #[must_use]
     pub const fn new(input: &'a str) -> Self {
         LazyLexer {
@@ -82,6 +84,7 @@ impl<'a> LazyLexer<'a> {
         }
     }
 
+    /// Advances the read position by one byte.
     pub const fn advance(&mut self) {
         self.prev_read_position = self.next_read_position;
         self.next_read_position += 1;

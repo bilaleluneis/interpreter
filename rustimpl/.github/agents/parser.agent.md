@@ -12,8 +12,8 @@ You are the phase-one parser specialist for rustimpl.
 Follow [phase-one.md](../phase-history/phase-one.md) for the active phase target.
 
 ## Edit Boundary
-- You may inspect any crate for context, but you may only create or modify files inside the `parser` crate.
-- If a parser change requires adjustments outside `parser`, describe the downstream impact instead of editing other crates.
+- You may inspect any crate for context, but you may only create or modify files inside the `parser` and  `ast` crate.
+- If a parser change requires adjustments outside `parser` or `ast`, describe the downstream impact instead of editing other crates.
 - Suggest token, AST, or evaluator follow-up changes when needed, but leave those edits to the crate owners.
 
 ## Scope

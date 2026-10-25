@@ -1,6 +1,7 @@
 //! AST node definitions for the Monkey language.
-
-/// Boolean literal AST node.
-pub mod boolean;
-/// Shared AST node traits.
-pub mod node;
+/// Expression enum.
+pub mod expression;
+/// Program root.
+pub mod program;
+/// Statement enum.
+pub mod statement;
